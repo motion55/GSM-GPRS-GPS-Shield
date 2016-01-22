@@ -21,7 +21,7 @@ public:
      // constructor:
      // default timeout is 5 seconds
 //	WideTextFinder(SoftwareSerial &stream, int timeout = 5);          // Ethernet constructor
-	WideTextFinder(Stream &stream, int timeout = 5);          // Ethernet constructor
+	WideTextFinder(Stream &stream, int timeout = 5);
 
      // Manage debug
      void setDebug(boolean d);

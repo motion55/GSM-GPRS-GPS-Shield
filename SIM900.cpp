@@ -12,7 +12,7 @@ SIMCOM900::SIMCOM900() {};
 SIMCOM900::~SIMCOM900() {};
 
 /**********************************************************
-Function: 	This function premits to wake up the module
+Function: 	This function permits to wake up the module
 			(only for SIM908) when it goes in energy saving
 			mode.
 
@@ -180,9 +180,8 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
      if (getStatus()==IDLE)
        return false;
      */
-#ifdef UNO
      _tf.setTimeout(_GSM_DATA_TOUT_);
-#endif
+
      //_cell.flush();
      WaitResp(500, 500);
      SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
@@ -262,12 +261,8 @@ boolean SIMCOM900::readCall(char* number, int nlength)
      if(gsm.WaitResp(5000, 50, "+CLIP: \"")!=RX_FINISHED_STR_RECV)
           //if(_tf.find("+CLIP: \""))
      {
-#ifdef UNO
 		 _tf.getString("", "\"", number, nlength);
-#endif
-#ifdef MEGA
-		 _tf.getString("", "\"", number, nlength);
-#endif
+
           SimpleWriteln(F("ATH"));
           delay(1000);
           //_cell.flush();
@@ -346,12 +341,8 @@ int SIMCOM900::getCCI(char *cci)
      SimpleWriteln(F("AT+QCCID"));
 
      //Read response from modem
-#ifdef UNO
+
      _tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
-#endif
-#ifdef MEGA
-	 _tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
-#endif
 
      //Expect str_ok.
      if(gsm.WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV)

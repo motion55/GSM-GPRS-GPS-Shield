@@ -1,8 +1,11 @@
 #ifndef GSM_H
 #define GSM_H
 
-//#define UNO
-#define MEGA
+//#define MEGA
+
+#ifndef MEGA
+#define UNO
+#endif
 
 #include <SoftwareSerial.h>
 #include <inttypes.h>
@@ -19,10 +22,6 @@
 
 #define DEBUG_ON
 
-
-#ifdef MEGA
-//#include "HWSerial.h"
-#endif
 
 // if defined - debug print is enabled with possibility to print out
 // debug texts to the terminal program
@@ -185,8 +184,7 @@ private:
 protected:
 #ifdef MEGA
 #define _cell	Serial1
-#endif
-#ifdef UNO
+#else
      SoftwareSerial _cell;
 #endif
      int isIP(const char* cadena);
