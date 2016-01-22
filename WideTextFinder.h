@@ -8,7 +8,8 @@
 
 class WideTextFinder {
 private:
-     SoftwareSerial* nSerialStream;
+//   SoftwareSerial* nSerialStream;
+     Stream* nSerialStream;
 
      unsigned long timeout;    // number of seconds to wait for the next char before aborting read
      unsigned long startMillis; // used for timeout measurement
@@ -19,7 +20,8 @@ private:
 public:
      // constructor:
      // default timeout is 5 seconds
-     WideTextFinder(SoftwareSerial &stream, int timeout = 5);          // Ethernet constructor
+//	WideTextFinder(SoftwareSerial &stream, int timeout = 5);          // Ethernet constructor
+	WideTextFinder(Stream &stream, int timeout = 5);          // Ethernet constructor
 
      // Manage debug
      void setDebug(boolean d);

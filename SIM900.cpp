@@ -263,10 +263,10 @@ boolean SIMCOM900::readCall(char* number, int nlength)
           //if(_tf.find("+CLIP: \""))
      {
 #ifdef UNO
-          _tf.getString("", "\"", number, nlength);
+		 _tf.getString("", "\"", number, nlength);
 #endif
 #ifdef MEGA
-          _cell.getString("", "\"", number, nlength);
+		 _tf.getString("", "\"", number, nlength);
 #endif
           SimpleWriteln(F("ATH"));
           delay(1000);
@@ -350,7 +350,7 @@ int SIMCOM900::getCCI(char *cci)
      _tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
 #endif
 #ifdef MEGA
-     _cell.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
+	 _tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
 #endif
 
      //Expect str_ok.

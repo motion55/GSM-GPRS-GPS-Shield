@@ -24,8 +24,9 @@ char WideTextFinder::read()
 // constructors
 //default timeout is 5 seconds
 
-WideTextFinder::WideTextFinder(SoftwareSerial &stream, int timeout) :
-     nSerialStream(&stream)
+//WideTextFinder::WideTextFinder(SoftwareSerial &stream, int timeout) :
+WideTextFinder::WideTextFinder(Stream &stream, int timeout) :
+	nSerialStream(&stream)
 {
      this->timeout = timeout * 1000L;
      debug=true;
