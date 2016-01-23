@@ -37,8 +37,8 @@ void setup()
 
      if(started) {
           //Enable this two lines if you want to send an SMS.
-          //if (sms.SendSMS("3471234567", "Arduino SMS"))
-          //Serial.println("\nSMS sent OK");
+          if (sms.SendSMS("09297895641", "Arduino SMS"))
+			Serial.println("\nSMS sent OK");
      }
 
 };
@@ -54,10 +54,12 @@ void loop()
           }
           **/
           //get 1st sms
-          sms.GetSMS(1,n,20,smsbuffer,160);
-          Serial.println(n);
-          Serial.println(smsbuffer);
-          
+		 if (sms.GetSMS(1, n, 20, smsbuffer, 160))
+		 {
+			 Serial.println(n);
+			 Serial.println(smsbuffer);
+			 sms.DeleteSMS(1);
+		 }
           delay(1000);
      }
 };
