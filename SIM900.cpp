@@ -108,22 +108,22 @@ int SIMCOM900::read(char* result, int resultlength)
      char temp;
      int i=0;
 
-#ifdef DEBUG_ON
-     Serial.print(F("Starting read..\nWaiting for Data.."));
+#ifdef DEBUG_SERIAL
+	 DEBUG_SERIAL.print(F("Starting read..\nWaiting for Data.."));
 #endif
      // Wait until we start receiving data
      while(gsm.available()<1) {
           delay(100);
-#ifdef DEBUG_ON
-          Serial.print(F("."));
+#ifdef DEBUG_SERIAL
+		  DEBUG_SERIAL.print(F("."));
 #endif
      }
 
      while(gsm.available()>0 && i<(resultlength-1)) {
           temp=_cell.read();
           if(temp>0) {
-#ifdef DEBUG_ON
-               Serial.print(temp);
+#ifdef DEBUG_SERIAL
+               DEBUG_SERIAL.print(temp);
 #endif
                result[i]=temp;
                i++;
@@ -134,8 +134,8 @@ int SIMCOM900::read(char* result, int resultlength)
      // Terminate the string
      result[resultlength-1]='\0';
 
-#ifdef DEBUG_ON
-     Serial.println(F("\nDone.."));
+#ifdef DEBUG_SERIAL
+     DEBUG_SERIAL.println(F("\nDone.."));
 #endif
      return i;
 }
@@ -171,7 +171,10 @@ int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
 
 boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 {
-     Serial.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
+#ifdef ERROR_SERIAL
+	ERROR_SERIAL.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
+#endif // DEBUG
+
      long index;
      char *p_char;
      char *p_char1;
@@ -224,15 +227,15 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
           // #ifdef MEGA
           //index=_cell.read();
           // #endif
-          // Serial.println("DEBUG");
+          // DEBUG_SERIAL.println("DEBUG");
           // #ifdef UNO
           // _tf.getString("\",\"", "\"", number, nlength);
           // #endif
-          // Serial.println("PRIMA");
+          // DEBUG_SERIAL.println("PRIMA");
           // #ifdef MEGA
           // _cell.getString("\",\"", "\"", number, nlength);
           // #endif
-          // Serial.println("DEBUG");
+          // DEBUG_SERIAL.println("DEBUG");
           // #ifdef UNO
           // _tf.getString("\n", "\nOK", msg, msglength);
           // #endif
@@ -242,8 +245,8 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 
           SimpleWrite(F("AT+CMGD="));
           SimpleWriteln(index);
-          // Serial.print("VAL= ");
-          // Serial.println(index);
+          // DEBUG_SERIAL.print("VAL= ");
+          // DEBUG_SERIAL.println(index);
           gsm.WaitResp(5000, 50, str_ok);
           return true;
      };
@@ -388,15 +391,15 @@ uint8_t SIMCOM900::read()
      return _cell.read();
 }
 
-void SIMCOM900::SimpleRead()
+void SIMCOM900::SimpleRead(Stream &_Serial)
 {
-     char datain;
-     if(_cell.available()>0) {
-          datain=_cell.read();
-          if(datain>0) {
-               Serial.print(datain);
-          }
-     }
+	char datain;
+	if (_cell.available() > 0) {
+		datain = _cell.read();
+		if (datain > 0) {
+			_Serial.print(datain);
+		}
+	}
 }
 
 void SIMCOM900::SimpleWrite(char *comm)
@@ -439,13 +442,13 @@ void SIMCOM900::SimpleWriteln(int comm)
      _cell.println(comm);
 }
 
-void SIMCOM900::WhileSimpleRead()
+void SIMCOM900::WhileSimpleRead(Stream &_Serial)
 {
      char datain;
      while(_cell.available()>0) {
           datain=_cell.read();
           if(datain>0) {
-               Serial.print(datain);
+			  _Serial.print(datain);
           }
      }
 }

@@ -20,8 +20,9 @@
 #define lf    10 //Ascii character for line feed.
 #define GSM_LIB_VERSION 308 // library version X.YY (e.g. 1.00)
 
-#define DEBUG_ON
-
+// if defined, debug messages are sent to this serial port
+#define DEBUG_SERIAL	Serial
+#define ERROR_SERIAL	Serial
 
 // if defined - debug print is enabled with possibility to print out
 // debug texts to the terminal program

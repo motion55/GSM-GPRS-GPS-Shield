@@ -25,8 +25,8 @@ public:
      virtual uint8_t read();
      virtual int available();
      int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
-     void SimpleRead();
-     void WhileSimpleRead();
+	 void SimpleRead(Stream &_Serial);
+     void WhileSimpleRead(Stream &_Serial);
      void SimpleWrite(char *comm);
      void SimpleWrite(char const *comm);
      void SimpleWrite(int comm);
