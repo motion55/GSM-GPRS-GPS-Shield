@@ -48,9 +48,9 @@ char SIMCOM900::forceON()
      }
 
      if((*p_char1)=='4') {
-          digitalWrite(GSM_ON, HIGH);
+          digitalWrite(_GSM_ON, HIGH);
           delay(1200);
-          digitalWrite(GSM_ON, LOW);
+          digitalWrite(_GSM_ON, LOW);
           delay(10000);
           ret_val=2;
      }

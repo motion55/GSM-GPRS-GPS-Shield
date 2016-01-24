@@ -396,10 +396,6 @@ int InetGSM::dettachGPRS()
 {
      if (gsm.getStatus()==gsm.IDLE) return 0;
 
-     //gsm._tf.setTimeout(_GSM_CONNECTION_TOUT_);
-
-     //_cell.flush();
-
      //GPRS dettachment.
      gsm.SimpleWriteln("AT+CGATT=0");
      if(gsm.WaitResp(5000, 50, "OK")!=RX_FINISHED_STR_NOT_RECV) {
@@ -408,27 +404,12 @@ int InetGSM::dettachGPRS()
      }
      delay(500);
 
-     // Commented in initial trial code!!
-     //Stop IP stack.
-     //_cell << "AT+WIPCFG=0" <<  _DEC(cr) << endl;
-     //	if(!gsm._tf.find("OK")) return 0;
-     //Close GPRS bearer.
-     //_cell << "AT+WIPBR=0,6" <<  _DEC(cr) << endl;
-
      gsm.setStatus(gsm.READY);
      return 1;
 }
 
 int InetGSM::connectTCP(const char* server, int port)
 {
-     //gsm._tf.setTimeout(_TCP_CONNECTION_TOUT_);
-
-     //Status = ATTACHED.
-     //if (getStatus()!=ATTACHED)
-     //return 0;
-
-     //_cell.flush();
-
      //Visit the remote TCP server.
      gsm.SimpleWrite("AT+CIPSTART=\"TCP\",\"");
      gsm.SimpleWrite(server);

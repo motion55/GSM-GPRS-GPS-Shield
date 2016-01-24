@@ -1,11 +1,7 @@
 #ifndef GSM_H
 #define GSM_H
 
-//#define MEGA
-
-#ifndef MEGA
-#define UNO
-#endif
+#define _COMPORT_
 
 #include <SoftwareSerial.h>
 #include <inttypes.h>
@@ -42,8 +38,8 @@
 
 
 // pins definition
-#define GSM_ON              8 // connect GSM Module turn ON to pin 77 
-#define GSM_RESET           9 // connect GSM Module RESET to pin 35
+#define GSM_ON              7
+#define GSM_RESET           8
 //#define DTMF_OUTPUT_ENABLE  71 // connect DTMF Output Enable not used
 #define DTMF_DATA_VALID     14 // connect DTMF Data Valid to pin 14
 #define DTMF_DATA0          72 // connect DTMF Data0 to pin 72
@@ -155,6 +151,11 @@ enum getsms_ret_val_enum {
      GETSMS_LAST_ITEM
 };
 
+#ifdef _COMPORT_
+#include "ComPort.h"
+#else
+#define UNO
+#endif
 
 class GSM {
 public:
@@ -183,12 +184,28 @@ private:
      char InitSMSMemory(void);
 
 protected:
-#ifdef MEGA
-#define _cell	Serial1
-#else
-     SoftwareSerial _cell;
-#endif
      int isIP(const char* cadena);
+	 int _GSM_ON, _GSM_RESET;
+#ifdef _COMPORT_
+	 ComPort	_cell;
+public:
+	inline void SelectHardwareSerial(HardwareSerial *HW_Serial, 
+		int GSM_ON_pin = GSM_ON, int GSM_RESET_pin = 0)
+	{
+		_cell.SelectHardwareSerial(HW_Serial); 
+		_GSM_ON = GSM_ON_pin;
+		_GSM_RESET = GSM_RESET_pin;
+	}
+	inline void SelectSoftwareSerial(uint8_t receivePin, uint8_t transmitPin,
+		int GSM_ON_pin = GSM_ON, int GSM_RESET_pin = 0)
+	{
+		_cell.SelectSoftwareSerial(receivePin, transmitPin);  
+		_GSM_ON = GSM_ON_pin;
+		_GSM_RESET = GSM_RESET_pin;
+	}
+#else
+	 SoftwareSerial _cell;
+#endif
 
 public:
      WideTextFinder _tf;

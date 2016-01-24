@@ -27,30 +27,30 @@ based on QuectelM10 chip.
 #define _GSM_TXPIN_ 2
 #define _GSM_RXPIN_ 3
 
-#ifdef MEGA
-GSM::GSM(): _tf(_cell, 10)
-{
-};
+#ifdef _COMPORT_
+GSM::GSM(): _tf(_cell, 10), _status(IDLE)
 #else
 GSM::GSM() :_cell(_GSM_TXPIN_, _GSM_RXPIN_), _tf(_cell, 10), _status(IDLE)
-{
-};
 #endif
+{
+	_GSM_ON = GSM_ON;
+	_GSM_RESET = 0;
+};
 
 
 int GSM::begin(long baud_rate)
 {
 	 // Set pin modes
-	 pinMode(GSM_ON,OUTPUT);
-	 pinMode(GSM_RESET,OUTPUT);
+	 pinMode(_GSM_ON,OUTPUT);
+	 if (_GSM_RESET>0) pinMode(_GSM_RESET,OUTPUT);
 
 #ifdef UNO
-     if (baud_rate==115200) {
-	#ifdef DEBUG_SERIAL
-		 DEBUG_SERIAL.println(F("Don't use baudrate 115200 with Software DEBUG_SERIAL.\nAutomatically changed at 9600."));
+	if (baud_rate==115200) {
+	#ifdef ERROR_SERIAL
+		 ERROR_SERIAL.println(F("Don't use baud rate 115200 with SoftwareSerial.\nAutomatically changed at 9600."));
 	#endif
 		 baud_rate = 9600;
-     }
+	}
 #endif
      int response=-1;
      int cont=0;
@@ -69,9 +69,9 @@ int GSM::begin(long baud_rate)
                DEBUG_SERIAL.println(F("DB:NO RESP"));
 #endif
                // generate turn on pulse
-               digitalWrite(GSM_ON, HIGH);
+               digitalWrite(_GSM_ON, HIGH);
                delay(1200);
-               digitalWrite(GSM_ON, LOW);
+               digitalWrite(_GSM_ON, LOW);
                delay(10000);
                WaitResp(1000, 1000);
           } else {
@@ -303,9 +303,9 @@ int GSM::begin(long baud_rate)
 #ifdef DEBUG_SERIAL
 		  DEBUG_SERIAL.println(F("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.cpp"));
 #endif
-          digitalWrite(GSM_ON, HIGH);
+          digitalWrite(_GSM_ON, HIGH);
           delay(1200);
-          digitalWrite(GSM_ON, LOW);
+          digitalWrite(_GSM_ON, LOW);
           delay(10000);
           return 0;
      }
