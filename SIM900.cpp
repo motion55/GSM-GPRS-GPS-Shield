@@ -986,11 +986,6 @@ char GSM::ComparePhoneNumber(byte position, char *phone_number)
      ret_val = 0; // numbers are not the same so far
      if (position == 0) return (-3);
      if (1 == GetPhoneNumber(position, sim_phone_number)) {
-          //Serial.print("CHIAMANTE ");
-          //Serial.println(phone_number);
-          //Serial.print("SALVATO ");
-          //Serial.println(sim_phone_number);
-
           // there is a valid number at the spec. SIM position
           // -------------------------------------------------
           if (0 == strcmp(phone_number, sim_phone_number)) {

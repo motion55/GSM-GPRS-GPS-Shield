@@ -21,7 +21,7 @@
 #define GSM_LIB_VERSION 308 // library version X.YY (e.g. 1.00)
 
 // if defined, debug messages are sent to this serial port
-#define DEBUG_SERIAL	Serial
+//#define DEBUG_SERIAL	Serial
 #define ERROR_SERIAL	Serial
 
 // if defined - debug print is enabled with possibility to print out
