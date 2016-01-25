@@ -67,13 +67,18 @@ void ComPort::begin(long speed)
 	if ((_SW_Serial == NULL) && (_HW_Serial == NULL))
 	{
 		SelectSoftwareSerial(_COMPORT_SS_RXPIN_, _COMPORT_SS_TXPIN_);
+		#if defined(HAVE_HWSERIAL0)
+		if (_SW_Serial == NULL) _HW_Serial = &Serial;
+		#elif defined(HAVE_HWSERIAL1)
+		if (_SW_Serial == NULL) _HW_Serial = &Serial1;
+		#endif
 	}
 
 	if (_SW_Serial != NULL)
 	{
 		_SW_Serial->begin(speed);
 	}
-	else
+	else if (_HW_Serial != NULL)
 	{
 		_HW_Serial->begin(speed);
 	}
