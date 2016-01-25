@@ -15,7 +15,7 @@ SMSGSM sms;
 int numdata;
 boolean started=false;
 char smsbuffer[160];
-char n[20] = "09291234567";	//Replace with your cell number.
+char n[20] = "09297895641";	//Replace with your cell number.
 
 const int RX_pin = 2;
 const int TX_pin = 3;
@@ -28,8 +28,10 @@ void setup()
   Serial.println("GSM Shield testing.");
 
   //Configure Comm Port to select Hardware or Software serial
+#ifdef _COMPORT_
   //gsm.SelectHardwareSerial(&Serial, GSM_ON_pin);
   gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
+#endif
 
   //Configure baudrate.
   if (gsm.begin(9600)) 
@@ -63,6 +65,7 @@ void loop()
       Serial.println(n);
       Serial.println(smsbuffer);
       sms.DeleteSMS(1);
+	  sms.SendSMS(n, smsbuffer);
     }
     delay(1000);
   }
