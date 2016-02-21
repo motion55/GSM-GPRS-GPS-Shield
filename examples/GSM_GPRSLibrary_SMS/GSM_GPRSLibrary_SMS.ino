@@ -1,3 +1,4 @@
+
 #include "SIM900.h"
 #include <SoftwareSerial.h>
 //If not used, is better to exclude the HTTP library,
@@ -14,10 +15,10 @@ SMSGSM sms;
 
 int numdata;
 boolean started=false;
-char smsbuffer[160];
+char smsbuffer[160] = "Arduino SMS";
 char n[20] = "09291234567";	//Replace with your cell number.
 
-const int RX_pin = 2;
+const int RX_pin = 10;
 const int TX_pin = 3;
 const int GSM_ON_pin = 7;
 
@@ -28,10 +29,8 @@ void setup()
   Serial.println("GSM Shield testing.");
 
   //Configure Comm Port to select Hardware or Software serial
-#ifdef _COMPORT_
-  //gsm.SelectHardwareSerial(&Serial, GSM_ON_pin);
-  gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
-#endif
+  gsm.SelectHardwareSerial(&Serial1, GSM_ON_pin);
+  //gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
 
   //Configure baudrate.
   if (gsm.begin(9600)) 
@@ -43,7 +42,7 @@ void setup()
   if(started) 
   {
     //Enable this two lines if you want to send an SMS.
-    if (sms.SendSMS(n, "Arduino SMS"))
+    if (sms.SendSMS(n,smsbuffer))
       Serial.println("\nSMS sent OK");
   }
 };
@@ -60,13 +59,37 @@ void loop()
     }
     **/
     //get 1st sms
-    if (sms.GetSMS(1, n, 20, smsbuffer, 160))
+    int pos=sms.IsSMSPresent(SMS_ALL);
+    if(pos>0&&pos<=20)
     {
-      Serial.println(n);
-      Serial.println(smsbuffer);
-      sms.DeleteSMS(1);
-      sms.SendSMS(n, smsbuffer);
-    }
-    delay(1000);
+      Serial.print(pos);
+      Serial.print(". ");
+			int ret_val = sms.GetSMS(pos, n, 20, smsbuffer, 160);
+			if (ret_val>0)
+			{
+        switch (ret_val) {
+        case GETSMS_UNREAD_SMS:
+          Serial.print("UNREAD SMS from ");
+          break;
+        case GETSMS_READ_SMS:
+          Serial.print("READ SMS from ");
+          break;
+        default:  
+          Serial.print("OTHER SMS from ");
+          break;
+        }
+        Serial.println(n);
+				Serial.println(smsbuffer);
+				if (ret_val==GETSMS_UNREAD_SMS)
+				{
+					if (sms.SendSMS(n,smsbuffer))
+          {
+						Serial.println("SMS resent OK");
+          }  
+				}
+				sms.DeleteSMS(pos);
+			}
+		}
   }
+  delay(1000);
 };

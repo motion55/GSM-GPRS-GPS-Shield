@@ -173,13 +173,13 @@ char SMSGSM::IsSMSPresent(byte required_status)
 
      switch (required_status) {
      case SMS_UNREAD:
-          gsm.SimpleWriteln(F("AT+CMGL=\"REC UNREAD\""));
+          gsm.SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
           break;
      case SMS_READ:
-          gsm.SimpleWriteln(F("AT+CMGL=\"REC READ\""));
+          gsm.SimpleWriteln(F("AT+CMGL=\"REC READ\",1"));
           break;
      case SMS_ALL:
-          gsm.SimpleWriteln(F("AT+CMGL=\"ALL\""));
+          gsm.SimpleWriteln(F("AT+CMGL=\"ALL\",1"));
           break;
      }
 
