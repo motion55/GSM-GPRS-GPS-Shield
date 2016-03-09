@@ -64,9 +64,9 @@ void loop()
     {
       Serial.print(pos);
       Serial.print(". ");
-			int ret_val = sms.GetSMS(pos, n, 20, smsbuffer, 160);
-			if (ret_val>0)
-			{
+      int ret_val = sms.GetSMS(pos, n, 20, smsbuffer, 160);
+      if (ret_val>0)
+      {
         switch (ret_val) {
         case GETSMS_UNREAD_SMS:
           Serial.print("UNREAD SMS from ");
@@ -79,17 +79,17 @@ void loop()
           break;
         }
         Serial.println(n);
-				Serial.println(smsbuffer);
-				if (ret_val==GETSMS_UNREAD_SMS)
-				{
-					if (sms.SendSMS(n,smsbuffer))
+        Serial.println(smsbuffer);
+        if (ret_val==GETSMS_UNREAD_SMS)
+        {
+          if (sms.SendSMS(n,smsbuffer))
           {
-						Serial.println("SMS resent OK");
+            Serial.println("SMS resent OK");
           }  
-				}
-				sms.DeleteSMS(pos);
-			}
-		}
+        }
+        sms.DeleteSMS(pos);
+      }
+    }
   }
   delay(1000);
 };
