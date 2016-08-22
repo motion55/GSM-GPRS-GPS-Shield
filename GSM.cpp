@@ -150,7 +150,7 @@ int GSM::begin(long baud_rate)
 #endif
                     _cell.print("AT+IPR=");
                     _cell.print(baud_rate);
-                    _cell.print("\r"); // send <CR>
+                    _cell.print(0x0d); // send <CR>
                     delay(500);
                     _cell.begin(baud_rate);
                     delay(100);
@@ -326,7 +326,7 @@ int GSM::begin(long baud_rate)
           delay(1000);
           _cell.print("AT+IPR=");
           _cell.print(baud_rate);
-          _cell.print("\r"); // send <CR>
+          _cell.print(0x0d); // send <CR>
           return(0);
      }
 }
@@ -713,9 +713,9 @@ void GSM::Echo(byte state)
      if (state == 0 or state == 1) {
           SetCommLineStatus(CLS_ATCMD);
 
-          _cell.print("ATE");
+          _cell.print((const char*)"ATE");
           _cell.print((int)state);
-          _cell.print("\r");
+          _cell.print(0x0d);
           delay(500);
           SetCommLineStatus(CLS_FREE);
      }
@@ -735,7 +735,7 @@ char GSM::InitSMSMemory(void)
      // send AT command to init memory for SMS in the SIM card
      // response:
      // +CPMS: <usedr>,<totalr>,<usedw>,<totalw>,<useds>,<totals>
-     if (AT_RESP_OK == SendATCmdWaitResp(F("AT+CPMS=\"SM\",\"SM\",\"SM\""), 1000, 1000, "+CPMS:", 10)) {
+     if (AT_RESP_OK == SendATCmdWaitResp(F("AT+CPMS=\"SM\",\"SM\",\"SM\""), 1000, 1000, (const char*)"+CPMS:", 10)) {
           ret_val = 1;
      } else ret_val = 0;
 

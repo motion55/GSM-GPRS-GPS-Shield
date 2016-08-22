@@ -26,24 +26,24 @@ void setup()
 {
   //Serial connection.
   Serial.begin(9600);
-  Serial.println("GSM Shield testing.");
+  Serial.println(F("GSM Shield testing."));
 
   //Configure Comm Port to select Hardware or Software serial
-  gsm.SelectHardwareSerial(&Serial1, GSM_ON_pin);
-  //gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
+  //gsm.SelectHardwareSerial(&Serial1, GSM_ON_pin);
+  gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
 
   //Configure baudrate.
   if (gsm.begin(9600)) 
   {
-    Serial.println("\nstatus=READY");
+    Serial.println(F("\nstatus=READY"));
     started=true;
-  } else Serial.println("\nstatus=IDLE");
+  } else Serial.println(F("\nstatus=IDLE"));
 
   if(started) 
   {
     //Enable this two lines if you want to send an SMS.
     if (sms.SendSMS(n,smsbuffer))
-      Serial.println("\nSMS sent OK");
+      Serial.println(F("\nSMS sent OK"));
   }
 };
 
@@ -69,13 +69,13 @@ void loop()
       {
         switch (ret_val) {
         case GETSMS_UNREAD_SMS:
-          Serial.print("UNREAD SMS from ");
+          Serial.print(F("UNREAD SMS from "));
           break;
         case GETSMS_READ_SMS:
-          Serial.print("READ SMS from ");
+          Serial.print(F("READ SMS from "));
           break;
         default:  
-          Serial.print("OTHER SMS from ");
+          Serial.print(F("OTHER SMS from "));
           break;
         }
         Serial.println(n);
@@ -84,7 +84,7 @@ void loop()
         {
           if (sms.SendSMS(n,smsbuffer))
           {
-            Serial.println("SMS resent OK");
+            Serial.println(F("SMS resent OK"));
           }  
         }
         sms.DeleteSMS(pos);
