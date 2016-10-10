@@ -33,7 +33,7 @@ GSM::GSM(): _tf(_cell, 10), _status(IDLE)
 GSM::GSM() :_cell(_GSM_TXPIN_, _GSM_RXPIN_), _tf(_cell, 10), _status(IDLE)
 #endif
 {
-	_GSM_ON = GSM_ON;
+	_GSM_ON = 0;
 	_GSM_RESET = 0;
 };
 
@@ -58,26 +58,31 @@ int GSM::begin(long baud_rate)
      boolean turnedON=false;
      SetCommLineStatus(CLS_ATCMD);
      _cell.begin(baud_rate);
-     p_comm_buf = &comm_buf[0];
      setStatus(IDLE);
 
      // if no-reply we turn to turn on the module
      for (cont=0; cont<3; cont++) {
-          if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)&&!turnedON) {		//check power
-               // there is no response => turn on the module
-#ifdef DEBUG_SERIAL
+          if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)&&!turnedON) 
+		  {	//check power
+			// there is no response => turn on the module
+			#ifdef DEBUG_SERIAL
                DEBUG_SERIAL.println(F("DB:NO RESP"));
-#endif
+			#endif
                // generate turn on pulse
-               digitalWrite(_GSM_ON, HIGH);
-               delay(1200);
-               digitalWrite(_GSM_ON, LOW);
-               delay(10000);
-               WaitResp(1000, 1000);
-          } else {
-#ifdef DEBUG_SERIAL
+			   if (_GSM_ON > 0)
+			   {
+				   digitalWrite(_GSM_ON, HIGH);
+				   delay(1200);
+				   digitalWrite(_GSM_ON, LOW);
+				   delay(10000);
+			   }
+			   WaitResp(1000, 1000);
+          } 
+		  else 
+		  {
+			#ifdef DEBUG_SERIAL
                DEBUG_SERIAL.println(F("DB:ELSE"));
-#endif
+			#endif
                WaitResp(1000, 1000);
           }
      }
@@ -169,7 +174,6 @@ int GSM::begin(long baud_rate)
           // communication line is not used yet = free
           SetCommLineStatus(CLS_FREE);
           // pointer is initialized to the first item of comm. buffer
-          p_comm_buf = &comm_buf[0];
      }
 
      if(norep==true&&!turnedON) {
@@ -286,9 +290,9 @@ int GSM::begin(long baud_rate)
                case 7:
                     _cell.begin(115200);
                     delay(1000);
-#ifdef DEBUG_SERIAL
+					#ifdef DEBUG_SERIAL
 					DEBUG_SERIAL.println(F("115200"));
-#endif
+					#endif
                     _cell.print(F("AT+IPR=9600\r"));
                     delay(1000);
                     _cell.begin(9600);
@@ -300,9 +304,9 @@ int GSM::begin(long baud_rate)
                }
           }
 
-#ifdef DEBUG_SERIAL
+		#ifdef DEBUG_SERIAL
 		  DEBUG_SERIAL.println(F("ERROR: SIM900 doesn't answer. Check power and serial pins in GSM.cpp"));
-#endif
+		#endif
           digitalWrite(_GSM_ON, HIGH);
           delay(1200);
           digitalWrite(_GSM_ON, LOW);
@@ -408,32 +412,33 @@ byte GSM::WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
 	do {
 		status = IsRxFinished();
 	} while (status == RX_NOT_FINISHED);
+
 	return (status);
 }
 
 byte GSM::WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
 	const char *expected_resp_string)
 {
-     byte status;
      byte ret_val;
+	 byte status = WaitResp(start_comm_tmout, max_interchar_tmout);
 
-     RxInit(start_comm_tmout, max_interchar_tmout);
-     // wait until response is not finished
-     do {
-          status = IsRxFinished();
-     } while (status == RX_NOT_FINISHED);
-
-     if (status == RX_FINISHED) {
+     if (status == RX_FINISHED) 
+	 {
           // something was received but what was received?
           // ---------------------------------------------
-          if(IsStringReceived(expected_resp_string)) {
+          if(IsStringReceived(expected_resp_string)) 
+		  {
                // expected string was received
-               // ----------------------------
-               ret_val = RX_FINISHED_STR_RECV;
-          } else {
+			   // ----------------------------
+			  ret_val = RX_FINISHED_STR_RECV;
+          } 
+		  else 
+		  {
                ret_val = RX_FINISHED_STR_NOT_RECV;
           }
-     } else {
+     }
+	 else 
+	 {
           // nothing was received
           // --------------------
           ret_val = RX_TMOUT_ERR;
@@ -543,106 +548,71 @@ byte GSM::IsRxFinished(void)
 
      // Rx state machine
      // ----------------
-
-     if (rx_state == RX_NOT_STARTED) {
+     if (rx_state == RX_NOT_STARTED) 
+	 {
           // Reception is not started yet - check tmout
-          if (!_cell.available()) {
-               // still no character received => check timeout
-               /*
-               #ifdef DEBUG_GSMRX
-
-               		DebugPrint("\r\nDEBUG: reception timeout", 0);
-               		DEBUG_SERIAL.print((unsigned long)(millis() - prev_time));
-               		DebugPrint("\r\nDEBUG: start_reception_tmout\r\n", 0);
-               		DEBUG_SERIAL.print(start_reception_tmout);
-
-
-               #endif
-               */
-               if ((unsigned long)(millis() - prev_time) >= start_reception_tmout) {
+          if (!_cell.available()) 
+		  {
+				// still no character received => check timeout
+				if ((unsigned long)(millis() - prev_time) >= start_reception_tmout) 
+				{
                     // timeout elapsed => GSM module didn't start with response
                     // so communication is takes as finished
-                    /*
-                    	#ifdef DEBUG_GSMRX
-                    		DebugPrint("\r\nDEBUG: RECEPTION TIMEOUT", 0);
-                    	#endif
-                    */
-                    comm_buf[comm_buf_len] = 0x00;
-                    ret_val = RX_TMOUT_ERR;
-               }
-          } else {
-               // at least one character received => so init inter-character
-               // counting process again and go to the next state
-               prev_time = millis(); // init tmout for inter-character space
-               rx_state = RX_ALREADY_STARTED;
+					comm_buf_len = 0;
+					comm_buf[comm_buf_len] = 0;
+					ret_val = RX_TMOUT_ERR;
+				}
+          } 
+		  else 
+		  {
+				// at least one character received => so init inter-character
+				// counting process again and go to the next state
+				comm_buf_len = 0;
+				comm_buf[comm_buf_len] = 0;
+				prev_time = millis(); // init timeout for inter-character space
+				rx_state = RX_ALREADY_STARTED;
           }
      }
 
-     if (rx_state == RX_ALREADY_STARTED) {
-          // Reception already started
-          // check new received bytes
-          // only in case we have place in the buffer
-          num_of_bytes = _cell.available();
-          // if there are some received bytes postpone the timeout
-          if (num_of_bytes) prev_time = millis();
+    if (rx_state == RX_ALREADY_STARTED) 
+	{
+		// Reception already started
+		// check new received bytes
+		// only in case we have place in the buffer
+		num_of_bytes = _cell.available();
+        // if there are some received bytes postpone the timeout
+		if (num_of_bytes) prev_time = millis();
 
-          // read all received bytes
-          while (num_of_bytes) {
-               num_of_bytes--;
-               if (comm_buf_len < COMM_BUF_LEN) {
-                    // we have still place in the GSM internal comm. buffer =>
-                    // move available bytes from circular buffer
-                    // to the rx buffer
-                    *p_comm_buf = _cell.read();
-
-                    p_comm_buf++;
-                    comm_buf_len++;
-                    comm_buf[comm_buf_len] = 0x00;  // and finish currently received characters
-                    // so after each character we have
-                    // valid string finished by the 0x00
-               } else {
-                    // comm buffer is full, other incoming characters
-                    // will be discarded
-                    // but despite of we have no place for other characters
-                    // we still must to wait until
-                    // inter-character tmout is reached
-
-                    // so just readout character from circular RS232 buffer
-                    // to find out when communication id finished(no more characters
-                    // are received in inter-char timeout)
-                    _cell.read();
-               }
-          }
+        // read all received bytes
+		while (num_of_bytes) 
+		{
+			num_of_bytes--;
+			byte dat = _cell.read();
+			if (comm_buf_len < COMM_BUF_LEN)
+			{
+				// we have still place in the GSM internal comm. buffer =>
+				// move available bytes from circular buffer
+				// to the rx buffer
+				if (dat >= ' ')
+				{
+					comm_buf[comm_buf_len] = dat;
+					comm_buf_len++;
+					comm_buf[comm_buf_len] = 0;  // and finish currently received characters
+				}
+			}
+		}
 
           // finally check the inter-character timeout
-          /*
-          #ifdef DEBUG_GSMRX
-
-          		DebugPrint("\r\nDEBUG: intercharacter", 0);
-          <			DEBUG_SERIAL.print((unsigned long)(millis() - prev_time));
-          		DebugPrint("\r\nDEBUG: interchar_tmout\r\n", 0);
-          		DEBUG_SERIAL.print(interchar_tmout);
-
-
-          #endif
-          */
-          if ((unsigned long)(millis() - prev_time) >= interchar_tmout) {
+          if ((unsigned long)(millis() - prev_time) >= interchar_tmout) 
+		  {
                // timeout between received character was reached
                // reception is finished
                // ---------------------------------------------
-
-               /*
-               #ifdef DEBUG_GSMRX
-
-               	DebugPrint("\r\nDEBUG: OVER INTER TIMEOUT", 0);
-               #endif
-               */
-               comm_buf[comm_buf_len] = 0x00;  // for sure finish string again
+               comm_buf[comm_buf_len] = 0;  // for sure finish string again
                // but it is not necessary
                ret_val = RX_FINISHED;
           }
      }
-
 
      return (ret_val);
 }
@@ -660,31 +630,35 @@ byte GSM::IsStringReceived(const char *compare_string)
      char *ch;
      byte ret_val = 0;
 
-     if(comm_buf_len) {
+     if(comm_buf_len) 
+	 {
 		#ifdef DEBUG_SERIAL
           DEBUG_SERIAL.print(F("ATT: "));
           DEBUG_SERIAL.println(compare_string);
-          DEBUG_SERIAL.print(F("RIC: "));
-          DEBUG_SERIAL.println((char *)comm_buf);
+          DEBUG_SERIAL.print(F("BUF: "));
+		  String s = comm_buf;
+          DEBUG_SERIAL.println(s);
 		#endif
           ch = strstr((char *)comm_buf, compare_string);
-          if (ch != NULL) {
-               ret_val = 1;
-               /*#ifdef DEBUG_PRINT
-               DebugPrint("\r\nDEBUG: expected string was received\r\n", 0);
-               #endif
-               */
-          } else {
-               /*#ifdef DEBUG_PRINT
-               DebugPrint("\r\nDEBUG: expected string was NOT received\r\n", 0);
-               #endif
-               */
-          }
-     } else {
+          if (ch != NULL) 
+		  {
+			  ret_val = 1;
+			#ifdef DEBUG_SERIAL
+			  DEBUG_SERIAL.println(F("DEBUG: Expected string received"));
+			#endif
+		  }
+		  else {
+			#ifdef DEBUG_SERIAL
+			  DEBUG_SERIAL.println(F("DEBUG: Expected string not received"));
+			#endif
+		  }
+     } 
+	 else 
+	 {
 		#ifdef DEBUG_SERIAL
           DEBUG_SERIAL.print(F("ATT: "));
           DEBUG_SERIAL.println(compare_string);
-          DEBUG_SERIAL.print(F("RIC: NO STRING RCVD"));
+          DEBUG_SERIAL.println(F("BUF: NO STRING RCVD"));
 		#endif
      }
 
@@ -699,7 +673,6 @@ void GSM::RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
      interchar_tmout = max_interchar_tmout;
      prev_time = millis();
      comm_buf[0] = 0x00; // end of string
-     p_comm_buf = &comm_buf[0];
      comm_buf_len = 0;
      _cell.flush(); // erase rx circular buffer
 }
