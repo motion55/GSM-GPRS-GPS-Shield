@@ -35,7 +35,7 @@ char SIMCOM900::forceON()
 
      SimpleWriteln(F("AT+CREG?"));
      WaitResp(5000, 100, str_ok);
-     if(IsStringReceived(str_ok)) {
+     if(IsStringReceived("OK")) {
           ret_val=1;
      }
      
@@ -71,7 +71,7 @@ int SIMCOM900::configandwait(char* pin)
           SimpleWriteln(F("AT+CGREG?"));
 
           //Se espera la unsolicited response de registered to network.
-          while(gsm.WaitResp(5000, 50, "+CGREG: 0,")!=RX_FINISHED_STR_RECV)
+          while(gsm.WaitResp(5000, 50, F("+CGREG: 0,"))!=RX_FINISHED_STR_RECV)
                //while (_tf.find("+CGREG: 0,"))  // CHANGE!!!!
           {
                //connCode=_tf.getValue();
@@ -149,7 +149,7 @@ int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
      //_cell.flush();
      SimpleWriteln(F("AT+QENG=1,0"));
      SimpleWriteln(F("AT+QENG?"));
-     if(gsm.WaitResp(5000, 50, "+QENG")!=RX_FINISHED_STR_NOT_RECV)
+     if(gsm.WaitResp(5000, 50, F("+QENG"))!=RX_FINISHED_STR_NOT_RECV)
           return 0;
 
      //mcc=_tf.getValue(); // The first one is 0
@@ -163,17 +163,17 @@ int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
      //cellid=_tf.getValue();
      cellid=_cell.read();
 
-     gsm.WaitResp(5000, 50, "+OK");
+     gsm.WaitResp(5000, 50, F("+OK"));
      SimpleWriteln(F("AT+QENG=1,0"));
-     gsm.WaitResp(5000, 50, "+OK");
+     gsm.WaitResp(5000, 50, F("+OK"));
      return 1;
 }
 
 boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 {
-#ifdef ERROR_SERIAL
+	#ifdef ERROR_SERIAL
 	ERROR_SERIAL.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
-#endif // DEBUG
+	#endif // DEBUG
 
      long index;
      char *p_char;
@@ -261,7 +261,7 @@ boolean SIMCOM900::readCall(char* number, int nlength)
           return false;
 
      //_tf.setTimeout(_GSM_DATA_TOUT_);
-     if(gsm.WaitResp(5000, 50, "+CLIP: \"")!=RX_FINISHED_STR_RECV)
+     if(gsm.WaitResp(5000, 50, F("+CLIP: \""))!=RX_FINISHED_STR_RECV)
           //if(_tf.find("+CLIP: \""))
      {
 		 _tf.getString("", "\"", number, nlength);
@@ -785,11 +785,11 @@ char GSM::GetPhoneNumber(byte position, char *phone_number)
      //send "AT+CPBR=XY" - where XY = position
      _cell.print(F("AT+CPBR="));
      _cell.print((int)position);
-     _cell.print("\r");
+     _cell.print(F("\r"));
 
      // 5000 msec. for initial comm tmout
      // 50 msec. for inter character timeout
-     switch (WaitResp(5000, 50, "+CPBR")) {
+     switch (WaitResp(5000, 50, F("+CPBR"))) {
      case RX_TMOUT_ERR:
           // response was not received in specific time
           ret_val = -2;

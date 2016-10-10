@@ -25,7 +25,7 @@
 //#define DEBUG_PRINT
 
 // if defined - debug print is enabled with possibility to print out
-// the data recived from gsm module
+// the data received from gsm module
 //#define DEBUG_GSMRX
 
 // if defined - debug LED is enabled, otherwise debug LED is disabled
@@ -73,8 +73,8 @@
 #define CLOSE_AND_REOPEN  1
 
 // Common string used
-#define str_ok 		"OK"			//string to reduce stack usage
-#define str_at		"AT"			//string to reduce stack usage
+#define str_ok 		F("OK")			//string to reduce stack usage
+#define str_at		F("AT")			//string to reduce stack usage
 
 // SMS type
 // use by method IsSMSPresent()
@@ -226,20 +226,21 @@ public:
      };
      void RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
      byte IsRxFinished(void);
-     byte IsStringReceived(char const *compare_string);
+     byte IsStringReceived(const char *compare_string);
      byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
      byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
-                   char const *expected_resp_string);
+                   const char *expected_resp_string);
+     byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
+                   const __FlashStringHelper *expected_response);
      char SendATCmdWaitResp(char const *AT_cmd_string,
                             uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
                             char const *response_string,
                             byte no_of_attempts);
-     char SendATCmdWaitResp(const __FlashStringHelper *AT_cmd_string,
+     char SendATCmdWaitResp(const __FlashStringHelper *AT_cmd,
                             uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
-                            char const *response_string,
+                            const __FlashStringHelper *response,
                             byte no_of_attempts);
      void Echo(byte state);
-
 
      //-----------------------
      // turns off/on the speaker
@@ -273,14 +274,14 @@ public:
      //-----------------------
 
      // debug methods
-#ifdef DEBUG_LED_ENABLED
+	#ifdef DEBUG_LED_ENABLED
      void BlinkDebugLED (byte num_of_blink);
-#endif
+	#endif
 
-#ifdef DEBUG_PRINT
+	#ifdef DEBUG_PRINT
      void DebugPrint(const char *string_to_print, byte last_debug_print);
      void DebugPrint(int number_to_print, byte last_debug_print);
-#endif
+	#endif
 };
 
 #endif

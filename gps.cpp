@@ -5,8 +5,8 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol)
      char *p_char;
      char *p_char1;
 
-     gsm.SimpleWriteln("AT+CBC");
-     gsm.WaitResp(5000, 100, "OK");
+     gsm.SimpleWriteln(F("AT+CBC"));
+     gsm.WaitResp(5000, 100, F("OK"));
      if(gsm.IsStringReceived("+CBC"))
           ret_val=1;
 
@@ -35,8 +35,8 @@ char GPSGSM::getBattTVol(char *str_vol)
      char *p_char1;
      char ret_val=0;
 
-     gsm.SimpleWriteln("AT+CBTE?");
-     gsm.WaitResp(5000, 100, "OK");
+     gsm.SimpleWriteln(F("AT+CBTE?"));
+     gsm.WaitResp(5000, 100, F("OK"));
      if(gsm.IsStringReceived("+CBTE"))
           ret_val=1;
 
@@ -70,8 +70,8 @@ char GPSGSM::deattachGPS()
 char GPSGSM::getStat()
 {
      char ret_val=-1;
-     gsm.SimpleWriteln("AT+CGPSSTATUS?");
-     gsm.WaitResp(5000, 100, "OK");
+     gsm.SimpleWriteln(F("AT+CGPSSTATUS?"));
+     gsm.WaitResp(5000, 100, F("OK"));
      if(gsm.IsStringReceived("Unknown")||gsm.IsStringReceived("unknown"))
           ret_val=0;
      else if(gsm.IsStringReceived("Not"))
@@ -88,8 +88,8 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
      char ret_val=0;
      char *p_char;
      char *p_char1;
-     gsm.SimpleWriteln("AT+CGPSINF=0");
-     gsm.WaitResp(5000, 100, "OK");
+     gsm.SimpleWriteln(F("AT+CGPSINF=0"));
+     gsm.WaitResp(5000, 100, F("OK"));
      if(gsm.IsStringReceived("OK"))
           ret_val=1;
 

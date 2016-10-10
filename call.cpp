@@ -295,22 +295,22 @@ void CallGSM::SendDTMF(char *number_string, int time)
 
      gsm.SimpleWrite(F("AT+VTD="));
      gsm.SimpleWriteln(time);
-     gsm.WaitResp(1000, 100, "OK");
+     gsm.WaitResp(1000, 100, F("OK"));
 
      gsm.SimpleWrite(F("AT+VTS=\""));
      gsm.SimpleWrite(number_string);
      gsm.SimpleWriteln(F("\""));
 
-     gsm.WaitResp(5000, 100, "OK");
+     gsm.WaitResp(5000, 100, F("OK"));
      gsm.SetCommLineStatus(CLS_FREE);
 }
 
 void CallGSM::SetDTMF(int DTMF_status)
 {
      if(DTMF_status==1)
-          gsm.SendATCmdWaitResp("AT+DDET=1", 500, 50, "OK", 5);
+          gsm.SendATCmdWaitResp(F("AT+DDET=1"), 500, 50, F("OK"), 5);
      else
-          gsm.SendATCmdWaitResp("AT+DDET=0", 500, 50, "OK", 5);
+          gsm.SendATCmdWaitResp(F("AT+DDET=0"), 500, 50, F("OK"), 5);
 }
 
 
