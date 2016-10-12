@@ -17,7 +17,7 @@
 #define GSM_LIB_VERSION 308 // library version X.YY (e.g. 1.00)
 
 // if defined, debug messages are sent to this serial port
-#define DEBUG_SERIAL	Serial
+//#define DEBUG_SERIAL	Serial
 #define ERROR_SERIAL	Serial
 
 // if defined - debug print is enabled with possibility to print out
@@ -183,11 +183,10 @@ private:
 
 protected:
 	int isIP(const char* cadena);
-	 int _GSM_ON, _GSM_RESET;
+	int _GSM_ON, _GSM_RESET;
 #ifdef _COMPORT_
-	 ComPort	_cell;
 public:
-	inline void SelectHardwareSerial(HardwareSerial *HW_Serial, 
+	inline void SelectHardwareSerial(HardwareSerial *HW_Serial,
 		int GSM_ON_pin = GSM_ON, int GSM_RESET_pin = 0)
 	{
 		_cell.SelectHardwareSerial(HW_Serial); 
@@ -201,9 +200,24 @@ public:
 		_GSM_ON = GSM_ON_pin;
 		_GSM_RESET = GSM_RESET_pin;
 	}
+	ComPort	_cell;
 #else
 	 SoftwareSerial _cell;
 #endif
+
+public:
+	virtual int available();
+	virtual uint8_t read();
+	void SimpleRead(Stream &_Serial = Serial);
+	 void WhileSimpleRead(Stream &_Serial = Serial);
+	 void SimpleWrite(char *comm);
+	 void SimpleWrite(char const *comm);
+	 void SimpleWrite(int comm);
+	 void SimpleWrite(const __FlashStringHelper *pgmstr);
+	 void SimpleWriteln(char *comm);
+	 void SimpleWriteln(char const *comm);
+	 void SimpleWriteln(const __FlashStringHelper *pgmstr);
+	 void SimpleWriteln(int comm);
 
 public:
 	WideTextFinder _tf;

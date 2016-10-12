@@ -74,9 +74,10 @@ int GSM::begin(long baud_rate)
 		else 
 		{
 			#ifdef DEBUG_SERIAL
-			DEBUG_SERIAL.println(F("DB:ELSE"));
+			DEBUG_SERIAL.println(F("DB: With RESP"));
 			#endif
 			WaitResp(1000, 1000);
+			break;
 		}
 	}
 
@@ -88,7 +89,6 @@ int GSM::begin(long baud_rate)
 		turnedON=true;
 		norep=false;
 	}
-
 
 	if (AT_RESP_ERR_DIF_RESP == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)&&!turnedON) 
 	{		//check OK
@@ -237,6 +237,10 @@ int GSM::begin(long baud_rate)
 				break;
 			}
 
+			//delay(1000);
+			//_cell.print(F("AT+IPR=9600\r"));
+			//delay(1000);
+			//_cell.begin(9600);
 			delay(1000);
 			if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5))
 			{
@@ -354,7 +358,7 @@ void GSM::InitParam(byte group)
 		InitSMSMemory();
 		// select phonebook memory storage
 		SendATCmdWaitResp(F("AT+CPBS=\"SM\""), 1000, 50, str_ok, 5);
-		//SendATCmdWaitResp(F("AT+CIPSHUT"), 500, 50, F("SHUT OK"), 5);
+		SendATCmdWaitResp(F("AT+CIPSHUT"), 500, 50, F("SHUT OK"), 5);
 		break;
 	}
 }
@@ -516,25 +520,25 @@ byte GSM::IsRxFinished(void)
 	 {
 		// Reception is not started yet - check tmout
 		if (!_cell.available()) 
-		  {
-				// still no character received => check timeout
-				if ((unsigned long)(millis() - prev_time) >= start_reception_tmout) 
-				{
+		{
+			// still no character received => check timeout
+			if ((unsigned long)(millis() - prev_time) >= start_reception_tmout) 
+			{
 				// timeout elapsed => GSM module didn't start with response
 				// so communication is takes as finished
-					comm_buf_len = 0;
-					comm_buf[comm_buf_len] = 0;
-					ret_val = RX_TMOUT_ERR;
-				}
-		} 
-		  else 
-		  {
-				// at least one character received => so init inter-character
-				// counting process again and go to the next state
 				comm_buf_len = 0;
 				comm_buf[comm_buf_len] = 0;
-				prev_time = millis(); // init timeout for inter-character space
-				rx_state = RX_ALREADY_STARTED;
+				ret_val = RX_TMOUT_ERR;
+			}
+		}
+		else 
+		{
+			// at least one character received => so init inter-character
+			// counting process again and go to the next state
+			comm_buf_len = 0;
+			comm_buf[comm_buf_len] = 0;
+			prev_time = millis(); // init timeout for inter-character space
+			rx_state = RX_ALREADY_STARTED;
 		}
 	}
 
@@ -557,7 +561,6 @@ byte GSM::IsRxFinished(void)
 				// we have still place in the GSM internal comm. buffer =>
 				// move available bytes from circular buffer
 				// to the rx buffer
-				if (dat < ' ')	dat = ' ';
 				comm_buf[comm_buf_len] = dat;
 				comm_buf_len++;
 				comm_buf[comm_buf_len] = 0;  // and finish currently received characters
@@ -596,9 +599,11 @@ byte GSM::IsStringReceived(const char *compare_string)
 	{
 		#ifdef DEBUG_SERIAL
 		DEBUG_SERIAL.print(F("ATT: "));
-		DEBUG_SERIAL.println(compare_string);
+		DEBUG_SERIAL.write(compare_string);
+		DEBUG_SERIAL.write("\r\n");
 		DEBUG_SERIAL.print(F("BUF: "));
-		DEBUG_SERIAL.println((char*)comm_buf);
+		DEBUG_SERIAL.write((const char*)comm_buf);
+		DEBUG_SERIAL.write("\r\n");
 		#endif
 		ch = strstr((char*)comm_buf, compare_string);
 		if (ch != NULL) 
@@ -685,3 +690,623 @@ int GSM::isIP(const char* cadena)
 	}
 	return 1;
 }
+
+/*/////////////////////////////////////////////////////////////////*/
+
+int GSM::available()
+{
+	return _cell.available();
+}
+
+uint8_t GSM::read()
+{
+	return _cell.read();
+}
+
+void GSM::SimpleRead(Stream &_Serial)
+{
+	char datain;
+	if (_cell.available() > 0) {
+		datain = _cell.read();
+		if (datain > 0) {
+			_Serial.print(datain);
+		}
+	}
+}
+
+void GSM::SimpleWrite(char *comm)
+{
+	_cell.print(comm);
+}
+
+void GSM::SimpleWrite(const char *comm)
+{
+	_cell.print(comm);
+}
+
+void GSM::SimpleWrite(int comm)
+{
+	_cell.print(comm);
+}
+
+void GSM::SimpleWrite(const __FlashStringHelper *pgmstr)
+{
+	_cell.print(pgmstr);
+}
+
+void GSM::SimpleWriteln(char *comm)
+{
+	_cell.println(comm);
+}
+
+void GSM::SimpleWriteln(const __FlashStringHelper *pgmstr)
+{
+	_cell.println(pgmstr);
+}
+
+void GSM::SimpleWriteln(char const *comm)
+{
+	_cell.println(comm);
+}
+
+void GSM::SimpleWriteln(int comm)
+{
+	_cell.println(comm);
+}
+
+void GSM::WhileSimpleRead(Stream &_Serial)
+{
+	char datain;
+	while (_cell.available() > 0) {
+		datain = _cell.read();
+		if (datain > 0) {
+			_Serial.print(datain);
+		}
+	}
+}
+
+//---------------------------------------------
+/**********************************************************
+Turns on/off the speaker
+
+off_on: 0 - off
+1 - on
+**********************************************************/
+void GSM::SetSpeaker(byte off_on)
+{
+	if (CLS_FREE != GetCommLineStatus()) return;
+	SetCommLineStatus(CLS_ATCMD);
+	if (off_on) {
+		//SendATCmdWaitResp("AT#GPIO=5,1,2", 500, 50, "#GPIO:", 1);
+	}
+	else {
+		//SendATCmdWaitResp("AT#GPIO=5,0,2", 500, 50, "#GPIO:", 1);
+	}
+	SetCommLineStatus(CLS_FREE);
+}
+
+
+byte GSM::IsRegistered(void)
+{
+	return (module_status & STATUS_REGISTERED);
+}
+
+byte GSM::IsInitialized(void)
+{
+	return (module_status & STATUS_INITIALIZED);
+}
+
+
+/**********************************************************
+Method checks if the GSM module is registered in the GSM net
+- this method communicates directly with the GSM module
+in contrast to the method IsRegistered() which reads the
+flag from the module_status (this flag is set inside this method)
+
+- must be called regularly - from 1sec. to cca. 10 sec.
+
+return values:
+REG_NOT_REGISTERED  - not registered
+REG_REGISTERED      - GSM module is registered
+REG_NO_RESPONSE     - GSM doesn't response
+REG_COMM_LINE_BUSY  - comm line between GSM module and Arduino is not free
+for communication
+**********************************************************/
+byte GSM::CheckRegistration(void)
+{
+	byte status;
+	byte ret_val = REG_NOT_REGISTERED;
+
+	if (CLS_FREE != GetCommLineStatus()) return (REG_COMM_LINE_BUSY);
+	SetCommLineStatus(CLS_ATCMD);
+	_cell.println(F("AT+CREG?"));
+	// 5 sec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	status = WaitResp(5000, 50);
+
+	if (status == RX_FINISHED) {
+		// something was received but what was received?
+		// ---------------------------------------------
+		if (IsStringReceived("+CREG: 0,1")
+			|| IsStringReceived("+CREG: 0,5")) {
+			// it means module is registered
+			// ----------------------------
+			module_status |= STATUS_REGISTERED;
+
+
+			// in case GSM module is registered first time after reset
+			// sets flag STATUS_INITIALIZED
+			// it is used for sending some init commands which
+			// must be sent only after registration
+			// --------------------------------------------
+			if (!IsInitialized()) {
+				module_status |= STATUS_INITIALIZED;
+				SetCommLineStatus(CLS_FREE);
+				InitParam(PARAM_SET_1);
+			}
+			ret_val = REG_REGISTERED;
+		}
+		else {
+			// NOT registered
+			// --------------
+			module_status &= ~STATUS_REGISTERED;
+			ret_val = REG_NOT_REGISTERED;
+		}
+	}
+	else {
+		// nothing was received
+		// --------------------
+		ret_val = REG_NO_RESPONSE;
+	}
+	SetCommLineStatus(CLS_FREE);
+
+
+	return (ret_val);
+}
+
+
+/**********************************************************
+Method sets speaker volume
+
+speaker_volume: volume in range 0..14
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module did not answer in timeout
+-3 - GSM module has answered "ERROR" string
+
+OK ret val:
+-----------
+0..14 current speaker volume
+**********************************************************/
+/*
+char GSM::SetSpeakerVolume(byte speaker_volume)
+{
+
+char ret_val = -1;
+
+if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+SetCommLineStatus(CLS_ATCMD);
+// remember set value as last value
+if (speaker_volume > 14) speaker_volume = 14;
+// select speaker volume (0 to 14)
+// AT+CLVL=X<CR>   X<0..14>
+_cell.print("AT+CLVL=");
+_cell.print((int)speaker_volume);
+_cell.print("\r"); // send <CR>
+// 10 sec. for initial comm tmout
+// 50 msec. for inter character timeout
+if (RX_TMOUT_ERR == WaitResp(10000, 50)) {
+ret_val = -2; // ERROR
+}
+else {
+if(IsStringReceived(str_ok)) {
+last_speaker_volume = speaker_volume;
+ret_val = last_speaker_volume; // OK
+}
+else ret_val = -3; // ERROR
+}
+
+SetCommLineStatus(CLS_FREE);
+return (ret_val);
+}
+*/
+/**********************************************************
+Method increases speaker volume
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module did not answer in timeout
+-3 - GSM module has answered "ERROR" string
+
+OK ret val:
+-----------
+0..14 current speaker volume
+**********************************************************/
+/*
+char GSM::IncSpeakerVolume(void)
+{
+char ret_val;
+byte current_speaker_value;
+
+current_speaker_value = last_speaker_volume;
+if (current_speaker_value < 14) {
+current_speaker_value++;
+ret_val = SetSpeakerVolume(current_speaker_value);
+}
+else ret_val = 14;
+
+return (ret_val);
+}
+*/
+/**********************************************************
+Method decreases speaker volume
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module did not answer in timeout
+-3 - GSM module has answered "ERROR" string
+
+OK ret val:
+-----------
+0..14 current speaker volume
+**********************************************************/
+/*
+char GSM::DecSpeakerVolume(void)
+{
+char ret_val;
+byte current_speaker_value;
+
+current_speaker_value = last_speaker_volume;
+if (current_speaker_value > 0) {
+current_speaker_value--;
+ret_val = SetSpeakerVolume(current_speaker_value);
+}
+else ret_val = 0;
+
+return (ret_val);
+}
+*/
+
+/**********************************************************
+Method sends DTMF signal
+This function only works when call is in progress
+
+dtmf_tone: tone to send 0..15
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module didn't answer in timeout
+-3 - GSM module has answered "ERROR" string
+
+OK ret val:
+-----------
+0.. tone
+**********************************************************/
+/*
+char GSM::SendDTMFSignal(byte dtmf_tone)
+{
+char ret_val = -1;
+
+if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+SetCommLineStatus(CLS_ATCMD);
+// e.g. AT+VTS=5<CR>
+_cell.print("AT+VTS=");
+_cell.print((int)dtmf_tone);
+_cell.print("\r");
+// 1 sec. for initial comm tmout
+// 50 msec. for inter character timeout
+if (RX_TMOUT_ERR == WaitResp(1000, 50)) {
+ret_val = -2; // ERROR
+}
+else {
+if(IsStringReceived(str_ok)) {
+ret_val = dtmf_tone; // OK
+}
+else ret_val = -3; // ERROR
+}
+
+SetCommLineStatus(CLS_FREE);
+return (ret_val);
+}
+*/
+
+/**********************************************************
+Method returns state of user button
+
+
+return: 0 - not pushed = released
+1 - pushed
+**********************************************************/
+byte GSM::IsUserButtonPushed(void)
+{
+	byte ret_val = 0;
+	if (CLS_FREE != GetCommLineStatus()) return(0);
+	SetCommLineStatus(CLS_ATCMD);
+	//if (AT_RESP_OK == SendATCmdWaitResp("AT#GPIO=9,2", 500, 50, "#GPIO: 0,0", 1)) {
+	// user button is pushed
+	//  ret_val = 1;
+	//}
+	//else ret_val = 0;
+	//SetCommLineStatus(CLS_FREE);
+	//return (ret_val);
+}
+
+
+
+/**********************************************************
+Method reads phone number string from specified SIM position
+
+position:     SMS position <1..20>
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module didn't answer in timeout
+-3 - position must be > 0
+phone_number is empty string
+
+OK ret val:
+-----------
+0 - there is no phone number on the position
+1 - phone number was found
+phone_number is filled by the phone number string finished by 0x00
+so it is necessary to define string with at least
+15 bytes(including also 0x00 termination character)
+
+an example of usage:
+GSM gsm;
+char phone_num[20]; // array for the phone number string
+
+if (1 == GSM::GetPhoneNumber(1, phone_num)) {
+// valid phone number on SIM pos. #1
+// phone number string is copied to the phone_num array
+#ifdef DEBUG_PRINT
+GSM::DebugPrint("DEBUG phone number: ", 0);
+GSM::DebugPrint(phone_num, 1);
+#endif
+}
+else {
+// there is not valid phone number on the SIM pos.#1
+#ifdef DEBUG_PRINT
+GSM::DebugPrint("DEBUG there is no phone number", 1);
+#endif
+}
+**********************************************************/
+
+
+char GSM::GetPhoneNumber(byte position, char *phone_number)
+{
+	char ret_val = -1;
+
+	char *p_char;
+	char *p_char1;
+
+	if (position == 0) return (-3);
+	if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+	SetCommLineStatus(CLS_ATCMD);
+	ret_val = 0; // not found yet
+	phone_number[0] = 0; // phone number not found yet => empty string
+
+						 //send "AT+CPBR=XY" - where XY = position
+	_cell.print(F("AT+CPBR="));
+	_cell.print((int)position);
+	_cell.print(F("\r"));
+
+	// 5000 msec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	switch (WaitResp(5000, 50, F("+CPBR"))) {
+	case RX_TMOUT_ERR:
+		// response was not received in specific time
+		ret_val = -2;
+		break;
+
+	case RX_FINISHED_STR_RECV:
+		// response in case valid phone number stored:
+		// <CR><LF>+CPBR: <index>,<number>,<type>,<text><CR><LF>
+		// <CR><LF>OK<CR><LF>
+
+		// response in case there is not phone number:
+		// <CR><LF>OK<CR><LF>
+		p_char = strstr((char *)(comm_buf), ",\"");
+		if (p_char != NULL) {
+			p_char++;
+			p_char++;       // we are on the first phone number character
+							// find out '"' as finish character of phone number string
+			p_char1 = strchr((char *)(p_char), '"');
+			if (p_char1 != NULL) {
+				*p_char1 = 0; // end of string
+			}
+			// extract phone number string
+			strcpy(phone_number, (char *)(p_char));
+			// output value = we have found out phone number string
+			ret_val = 1;
+		}
+		break;
+
+	case RX_FINISHED_STR_NOT_RECV:
+		// only OK or ERROR => no phone number
+		ret_val = 0;
+		break;
+	}
+
+	SetCommLineStatus(CLS_FREE);
+	return (ret_val);
+}
+
+/**********************************************************
+Method writes phone number string to the specified SIM position
+
+position:     SMS position <1..20>
+phone_number: phone number string for the writing
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module didn't answer in timeout
+-3 - position must be > 0
+
+OK ret val:
+-----------
+0 - phone number was not written
+1 - phone number was written
+**********************************************************/
+char GSM::WritePhoneNumber(byte position, char *phone_number)
+{
+	char ret_val = -1;
+
+	if (position == 0) return (-3);
+	if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+	SetCommLineStatus(CLS_ATCMD);
+	ret_val = 0; // phone number was not written yet
+
+				 //send: AT+CPBW=XY,"00420123456789"
+				 // where XY = position,
+				 //       "00420123456789" = phone number string
+	_cell.print(F("AT+CPBW="));
+	_cell.print((int)position);
+	_cell.print(F(",\""));
+	_cell.print(phone_number);
+	_cell.print(F("\"\r"));
+
+	// 5000 msec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	switch (WaitResp(5000, 50, str_ok)) {
+	case RX_TMOUT_ERR:
+		// response was not received in specific time
+		break;
+
+	case RX_FINISHED_STR_RECV:
+		// response is OK = has been written
+		ret_val = 1;
+		break;
+
+	case RX_FINISHED_STR_NOT_RECV:
+		// other response: e.g. ERROR
+		break;
+	}
+
+	SetCommLineStatus(CLS_FREE);
+	return (ret_val);
+}
+
+
+/**********************************************************
+Method del phone number from the specified SIM position
+
+position:     SMS position <1..20>
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module didn't answer in timeout
+-3 - position must be > 0
+
+OK ret val:
+-----------
+0 - phone number was not deleted
+1 - phone number was deleted
+**********************************************************/
+char GSM::DelPhoneNumber(byte position)
+{
+	char ret_val = -1;
+
+	if (position == 0) return (-3);
+	if (CLS_FREE != GetCommLineStatus()) return (ret_val);
+	SetCommLineStatus(CLS_ATCMD);
+	ret_val = 0; // phone number was not written yet
+
+	//send: AT+CPBW=XY
+	// where XY = position
+	_cell.print(F("AT+CPBW="));
+	_cell.print((int)position);
+	_cell.print(F("\r"));
+
+	// 5000 msec. for initial comm tmout
+	// 50 msec. for inter character timeout
+	switch (WaitResp(5000, 50, str_ok)) {
+	case RX_TMOUT_ERR:
+		// response was not received in specific time
+		break;
+
+	case RX_FINISHED_STR_RECV:
+		// response is OK = has been written
+		ret_val = 1;
+		break;
+
+	case RX_FINISHED_STR_NOT_RECV:
+		// other response: e.g. ERROR
+		break;
+	}
+
+	SetCommLineStatus(CLS_FREE);
+	return (ret_val);
+}
+
+
+/**********************************************************
+Function compares specified phone number string
+with phone number stored at the specified SIM position
+
+position:       SMS position <1..20>
+phone_number:   phone number string which should be compare
+
+return:
+ERROR ret. val:
+---------------
+-1 - comm. line to the GSM module is not free
+-2 - GSM module didn't answer in timeout
+-3 - position must be > 0
+
+OK ret val:
+-----------
+0 - phone numbers are different
+1 - phone numbers are the same
+
+
+an example of usage:
+if (1 == ComparePhoneNumber(1, "123456789")) {
+// the phone num. "123456789" is stored on the SIM pos. #1
+// phone number string is copied to the phone_num array
+#ifdef DEBUG_PRINT
+DebugPrint("DEBUG phone numbers are the same", 1);
+#endif
+}
+else {
+#ifdef DEBUG_PRINT
+DebugPrint("DEBUG phone numbers are different", 1);
+#endif
+}
+**********************************************************/
+char GSM::ComparePhoneNumber(byte position, char *phone_number)
+{
+	char ret_val = -1;
+	char sim_phone_number[20];
+
+
+	ret_val = 0; // numbers are not the same so far
+	if (position == 0) return (-3);
+	if (1 == GetPhoneNumber(position, sim_phone_number)) {
+		// there is a valid number at the spec. SIM position
+		// -------------------------------------------------
+		if (0 == strcmp(phone_number, sim_phone_number)) {
+			// phone numbers are the same
+			// --------------------------
+			ret_val = 1;
+		}
+	}
+	return (ret_val);
+}
+
+//-----------------------------------------------------

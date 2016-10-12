@@ -22,19 +22,7 @@ public:
      boolean call(char* number, unsigned int milliseconds);
      char forceON();
      virtual int read(char* result, int resultlength);
-     virtual uint8_t read();
-     virtual int available();
      int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
-	 void SimpleRead(Stream &_Serial = Serial);
-     void WhileSimpleRead(Stream &_Serial = Serial);
-     void SimpleWrite(char *comm);
-     void SimpleWrite(char const *comm);
-     void SimpleWrite(int comm);
-     void SimpleWrite(const __FlashStringHelper *pgmstr);
-     void SimpleWriteln(char *comm);
-     void SimpleWriteln(char const *comm);
-     void SimpleWriteln(const __FlashStringHelper *pgmstr);
-     void SimpleWriteln(int comm);
 };
 
 extern SIMCOM900 gsm;
