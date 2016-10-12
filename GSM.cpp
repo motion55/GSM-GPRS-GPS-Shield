@@ -238,17 +238,13 @@ int GSM::begin(long baud_rate)
 			}
 
 			delay(1000);
-			_cell.print(F("AT+IPR=9600\r"));
-			delay(1000);
-			_cell.begin(9600);
-			delay(1000);
 			if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5))
 			{
 				delay(100);
 				if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5))
 				{
 					#ifdef DEBUG_SERIAL
-					DEBUG_SERIAL.println(F("DB:BR set to 9600"));
+					DEBUG_SERIAL.println(F("DB:BR found"));
 					#endif
 					turnedON = true;
 					break;
