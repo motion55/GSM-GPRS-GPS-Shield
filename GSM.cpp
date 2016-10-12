@@ -15,7 +15,7 @@ based on QuectelM10 chip.
 */
 
 #include "GSM.h"
-#include "WideTextFinder.h"
+//#include "WideTextFinder.h"
 
 //De-comment this two lines below if you have the
 //first version of GSM GPRS Shield
@@ -27,12 +27,13 @@ based on QuectelM10 chip.
 #define _GSM_TXPIN_ 2
 #define _GSM_RXPIN_ 3
 
-#ifdef _COMPORT_
-GSM::GSM(): _tf(_cell, 10), _status(IDLE)
+#ifdef WideTextFinder_h
+GSM::GSM(): _tf(_cell, 10)
 #else
-GSM::GSM() :_cell(_GSM_TXPIN_, _GSM_RXPIN_), _tf(_cell, 10), _status(IDLE)
+GSM::GSM() 
 #endif
 {
+	_status = IDLE;
 	_GSM_ON = 0;
 	_GSM_RESET = 0;
 };

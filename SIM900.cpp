@@ -30,68 +30,68 @@ Comments:	It would be nice to call this function
 char SIMCOM900::forceON()
 {
 	 char ret_val=0;
-     char *p_char;
-     char *p_char1;
+	char *p_char;
+	char *p_char1;
 
-     SimpleWriteln(F("AT+CREG?"));
-     WaitResp(5000, 100, str_ok);
-     if(IsStringReceived("OK")) {
-          ret_val=1;
-     }
-     
-     p_char = strchr((char *)(GSM::comm_buf),',');
-     p_char1 = p_char+1;
-     *(p_char1+2)=0;
-     p_char = strchr((char *)(p_char1), ',');
-     if (p_char != NULL) {
-          *p_char = 0;
-     }
+	SimpleWriteln(F("AT+CREG?"));
+	WaitResp(5000, 100, str_ok);
+	if(IsStringReceived("OK")) {
+		ret_val=1;
+	}
+	
+	p_char = strchr((char *)(GSM::comm_buf),',');
+	p_char1 = p_char+1;
+	*(p_char1+2)=0;
+	p_char = strchr((char *)(p_char1), ',');
+	if (p_char != NULL) {
+		*p_char = 0;
+	}
 
-     if((*p_char1)=='4') {
-          digitalWrite(_GSM_ON, HIGH);
-          delay(1200);
-          digitalWrite(_GSM_ON, LOW);
-          delay(10000);
-          ret_val=2;
-     }
+	if((*p_char1)=='4') {
+		digitalWrite(_GSM_ON, HIGH);
+		delay(1200);
+		digitalWrite(_GSM_ON, LOW);
+		delay(10000);
+		ret_val=2;
+	}
 
-     return ret_val;
+	return ret_val;
 }
 
 int SIMCOM900::configandwait(char* pin)
 {
-     int connCode;
-     //_tf.setTimeout(_GSM_CONNECTION_TOUT_);
+	int connCode;
+	//_tf.setTimeout(_GSM_CONNECTION_TOUT_);
 
-     if(pin) setPIN(pin); //syv
+	if(pin) setPIN(pin); //syv
 
-     // Try 10 times to register in the network. Note this can take some time!
-     for(int i=0; i<10; i++) {
-          //Ask for register status to GPRS network.
-          SimpleWriteln(F("AT+CGREG?"));
+	// Try 10 times to register in the network. Note this can take some time!
+	for(int i=0; i<10; i++) {
+		//Ask for register status to GPRS network.
+		SimpleWriteln(F("AT+CGREG?"));
 
-          //Se espera la unsolicited response de registered to network.
-          while(WaitResp(5000, 50, F("+CGREG: 0,"))!=RX_FINISHED_STR_RECV)
-               //while (_tf.find("+CGREG: 0,"))  // CHANGE!!!!
-          {
-               //connCode=_tf.getValue();
-               connCode=_cell.read();
-               if((connCode==1)||(connCode==5)) {
-                    setStatus(READY);
+		//Se espera la unsolicited response de registered to network.
+		while(WaitResp(5000, 50, F("+CGREG: 0,"))!=RX_FINISHED_STR_RECV)
+			//while (_tf.find("+CGREG: 0,"))  // CHANGE!!!!
+		{
+			//connCode=_tf.getValue();
+			connCode=_cell.read();
+			if((connCode==1)||(connCode==5)) {
+				setStatus(READY);
 
-                    SimpleWriteln(F("AT+CMGF=1")); //SMS text mode.
-                    delay(200);
-                    // Buah, we should take this to readCall()
-                    SimpleWriteln(F("AT+CLIP=1")); //SMS text mode.
-                    delay(200);
-                    //_cell << "AT+QIDEACT" <<  _DEC(cr) << endl; //To make sure not pending connection.
-                    //delay(1000);
+				SimpleWriteln(F("AT+CMGF=1")); //SMS text mode.
+				delay(200);
+				// Buah, we should take this to readCall()
+				SimpleWriteln(F("AT+CLIP=1")); //SMS text mode.
+				delay(200);
+				//_cell << "AT+QIDEACT" <<  _DEC(cr) << endl; //To make sure not pending connection.
+				//delay(1000);
 
-                    return 1;
-               }
-          }
-     }
-     return 0;
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 /**
@@ -129,31 +129,31 @@ int SIMCOM900::read(char* result, int resultlength)
 
 int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
 {
-     if (getStatus()==IDLE)
-          return 0;
+	if (getStatus()==IDLE)
+		return 0;
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);
-     //_cell.flush();
-     SimpleWriteln(F("AT+QENG=1,0"));
-     SimpleWriteln(F("AT+QENG?"));
-     if(WaitResp(5000, 50, F("+QENG"))!=RX_FINISHED_STR_NOT_RECV)
-          return 0;
+	//_tf.setTimeout(_GSM_DATA_TOUT_);
+	//_cell.flush();
+	SimpleWriteln(F("AT+QENG=1,0"));
+	SimpleWriteln(F("AT+QENG?"));
+	if(WaitResp(5000, 50, F("+QENG"))!=RX_FINISHED_STR_NOT_RECV)
+		return 0;
 
-     //mcc=_tf.getValue(); // The first one is 0
-     mcc=_cell.read();
-     //mcc=_tf.getValue();
-     mcc=_cell.read();
-     //mnc=_tf.getValue();
-     mnc=_cell.read();
-     //lac=_tf.getValue();
-     lac=_cell.read();
-     //cellid=_tf.getValue();
-     cellid=_cell.read();
+	//mcc=_tf.getValue(); // The first one is 0
+	mcc=_cell.read();
+	//mcc=_tf.getValue();
+	mcc=_cell.read();
+	//mnc=_tf.getValue();
+	mnc=_cell.read();
+	//lac=_tf.getValue();
+	lac=_cell.read();
+	//cellid=_tf.getValue();
+	cellid=_cell.read();
 
-     WaitResp(5000, 50, F("+OK"));
-     SimpleWriteln(F("AT+QENG=1,0"));
-     WaitResp(5000, 50, F("+OK"));
-     return 1;
+	WaitResp(5000, 50, F("+OK"));
+	SimpleWriteln(F("AT+QENG=1,0"));
+	WaitResp(5000, 50, F("+OK"));
+	return 1;
 }
 
 boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
@@ -162,196 +162,202 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 	ERROR_SERIAL.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
 	#endif // DEBUG
 
-     long index;
-     char *p_char;
-     char *p_char1;
+	long index;
+	char *p_char;
+	char *p_char1;
 
-     /*
-     if (getStatus()==IDLE)
-       return false;
-     */
-     _tf.setTimeout(_GSM_DATA_TOUT_);
+	/*
+	if (getStatus()==IDLE)
+		return false;
+	*/
+	#ifdef WideTextFinder_h
+	_tf.setTimeout(_GSM_DATA_TOUT_);
+	#endif
 
-     //_cell.flush();
-     WaitResp(500, 500);
-     SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
+	//_cell.flush();
+	WaitResp(500, 500);
+	SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
 
-     WaitResp(5000, 500);
-     if(IsStringReceived("+CMGL")) 
+	WaitResp(5000, 500);
+	if(IsStringReceived("+CMGL")) 
 	 {
-          //index
-          p_char = strchr((char *)(GSM::comm_buf),'+CMGL');
-          p_char1 = p_char+3;  //we are on the first char of string
-          p_char = p_char1+1;
-          *p_char = 0;
-          index=atoi(p_char1);
+		//index
+		p_char = strchr((char *)(GSM::comm_buf),'+CMGL');
+		p_char1 = p_char+3;  //we are on the first char of string
+		p_char = p_char1+1;
+		*p_char = 0;
+		index=atoi(p_char1);
 
-          p_char1 = p_char+1;
-          p_char = strstr((char *)(p_char1), "\",\"");
-          p_char1 = p_char+3;
-          p_char = strstr((char *)(p_char1), "\",\"");
-          if (p_char != NULL) {
-               *p_char = 0;
-          }
-          strcpy(number, (char *)(p_char1));
-          //////
+		p_char1 = p_char+1;
+		p_char = strstr((char *)(p_char1), "\",\"");
+		p_char1 = p_char+3;
+		p_char = strstr((char *)(p_char1), "\",\"");
+		if (p_char != NULL) {
+			*p_char = 0;
+		}
+		strcpy(number, (char *)(p_char1));
+		//////
 
-          p_char1 = p_char+3;
-          p_char = strstr((char *)(p_char1), "\",\"");
-          p_char1 = p_char+3;
+		p_char1 = p_char+3;
+		p_char = strstr((char *)(p_char1), "\",\"");
+		p_char1 = p_char+3;
 
-          p_char = strstr((char *)(p_char1), "\n");
-          p_char1 = p_char+1;
-          p_char = strstr((char *)(p_char1), "\n");
-          if (p_char != NULL) {
-               *p_char = 0;
-          }
-          strcpy(msg, (char *)(p_char1));
+		p_char = strstr((char *)(p_char1), "\n");
+		p_char1 = p_char+1;
+		p_char = strstr((char *)(p_char1), "\n");
+		if (p_char != NULL) {
+			*p_char = 0;
+		}
+		strcpy(msg, (char *)(p_char1));
 
-          // #ifdef UNO
-          // index=_tf.getValue();
-          // #endif
-          // #ifdef MEGA
-          //index=_cell.read();
-          // #endif
-          // DEBUG_SERIAL.println("DEBUG");
-          // #ifdef UNO
-          // _tf.getString("\",\"", "\"", number, nlength);
-          // #endif
-          // DEBUG_SERIAL.println("PRIMA");
-          // #ifdef MEGA
-          // _cell.getString("\",\"", "\"", number, nlength);
-          // #endif
-          // DEBUG_SERIAL.println("DEBUG");
-          // #ifdef UNO
-          // _tf.getString("\n", "\nOK", msg, msglength);
-          // #endif
-          // #ifdef MEGA
-          // _cell.getString("\n", "\nOK", msg, msglength);
-          // #endif
+		// #ifdef UNO
+		// index=_tf.getValue();
+		// #endif
+		// #ifdef MEGA
+		//index=_cell.read();
+		// #endif
+		// DEBUG_SERIAL.println("DEBUG");
+		// #ifdef UNO
+		// _tf.getString("\",\"", "\"", number, nlength);
+		// #endif
+		// DEBUG_SERIAL.println("PRIMA");
+		// #ifdef MEGA
+		// _cell.getString("\",\"", "\"", number, nlength);
+		// #endif
+		// DEBUG_SERIAL.println("DEBUG");
+		// #ifdef UNO
+		// _tf.getString("\n", "\nOK", msg, msglength);
+		// #endif
+		// #ifdef MEGA
+		// _cell.getString("\n", "\nOK", msg, msglength);
+		// #endif
 
-          SimpleWrite(F("AT+CMGD="));
-          SimpleWriteln(index);
-          // DEBUG_SERIAL.print("VAL= ");
-          // DEBUG_SERIAL.println(index);
-          WaitResp(5000, 50, str_ok);
-          return true;
-     };
-     return false;
+		SimpleWrite(F("AT+CMGD="));
+		SimpleWriteln(index);
+		// DEBUG_SERIAL.print("VAL= ");
+		// DEBUG_SERIAL.println(index);
+		WaitResp(5000, 50, str_ok);
+		return true;
+	};
+	return false;
 };
 
 boolean SIMCOM900::readCall(char* number, int nlength)
 {
-     int index;
+	int index;
 
-     if (getStatus()==IDLE)
-          return false;
+	if (getStatus()==IDLE)
+		return false;
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);
-     if(WaitResp(5000, 50, F("+CLIP: \""))!=RX_FINISHED_STR_RECV)
-          //if(_tf.find("+CLIP: \""))
-     {
-		 _tf.getString("", "\"", number, nlength);
+	//_tf.setTimeout(_GSM_DATA_TOUT_);
+	if(WaitResp(5000, 50, F("+CLIP: \""))!=RX_FINISHED_STR_RECV)
+		//if(_tf.find("+CLIP: \""))
+	{
+		#ifdef WideTextFinder_h
+		_tf.getString("", "\"", number, nlength);
+		#endif
 
-          SimpleWriteln(F("ATH"));
-          delay(1000);
-          //_cell.flush();
-          return true;
-     };
-     return false;
+		SimpleWriteln(F("ATH"));
+		delay(1000);
+		//_cell.flush();
+		return true;
+	};
+	return false;
 };
 
 boolean SIMCOM900::call(char* number, unsigned int milliseconds)
 {
-     if (getStatus()==IDLE)
-          return false;
+	if (getStatus()==IDLE)
+		return false;
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);
+	//_tf.setTimeout(_GSM_DATA_TOUT_);
 
-     SimpleWrite(F("ATD"));
-     SimpleWrite(number);
-     SimpleWriteln(F(";"));
-     delay(milliseconds);
-     SimpleWriteln(F("ATH"));
+	SimpleWrite(F("ATD"));
+	SimpleWrite(number);
+	SimpleWriteln(F(";"));
+	delay(milliseconds);
+	SimpleWriteln(F("ATH"));
 
-     return true;
+	return true;
 
 }
 
 int SIMCOM900::setPIN(char *pin)
 {
-     //Status = READY or ATTACHED.
-     if((getStatus() != IDLE))
-          return 2;
+	//Status = READY or ATTACHED.
+	if((getStatus() != IDLE))
+		return 2;
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
+	//_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
 
-     //_cell.flush();
+	//_cell.flush();
 
-     //AT command to set PIN.
-     SimpleWrite(F("AT+CPIN="));
-     SimpleWriteln(pin);
+	//AT command to set PIN.
+	SimpleWrite(F("AT+CPIN="));
+	SimpleWriteln(pin);
 
-     //Expect str_ok.
+	//Expect str_ok.
 
-     if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV)
-          return 0;
-     else
-          return 1;
+	if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV)
+		return 0;
+	else
+		return 1;
 }
 
 int SIMCOM900::changeNSIPmode(char mode)
 {
-     //_tf.setTimeout(_TCP_CONNECTION_TOUT_);
+	//_tf.setTimeout(_TCP_CONNECTION_TOUT_);
 
-     //if (getStatus()!=ATTACHED)
-     //    return 0;
+	//if (getStatus()!=ATTACHED)
+	//    return 0;
 
-     //_cell.flush();
+	//_cell.flush();
 
-     SimpleWrite(F("AT+QIDNSIP="));
-     SimpleWriteln(mode);
-     if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV) return 0;
-     //if(!_tf.find(str_ok)) return 0;
+	SimpleWrite(F("AT+QIDNSIP="));
+	SimpleWriteln(mode);
+	if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV) return 0;
+	//if(!_tf.find(str_ok)) return 0;
 
-     return 1;
+	return 1;
 }
 
 int SIMCOM900::getCCI(char *cci)
 {
-     //Status must be READY
-     if((getStatus() != READY))
-          return 2;
+	//Status must be READY
+	if((getStatus() != READY))
+		return 2;
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
+	//_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
 
-     //_cell.flush();
+	//_cell.flush();
 
-     //AT command to get CCID.
-     SimpleWriteln(F("AT+QCCID"));
+	//AT command to get CCID.
+	SimpleWriteln(F("AT+QCCID"));
 
-     //Read response from modem
+	//Read response from modem
 
-     _tf.getString("AT+QCCID\r\r\r\n","\r\n",cci, 21);
+	#ifdef WideTextFinder_h
+	_tf.getString("AT+QCCID\r\r\r\n", "\r\n", cci, 21);
+	#endif
 
-     //Expect str_ok.
-     if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV)
-          return 0;
-     else
-          return 1;
+	//Expect str_ok.
+    if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV)
+		return 0;
+    else
+		return 1;
 }
 
 int SIMCOM900::getIMEI(char *imei)
 {
 
-     //_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
+	//_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.
 
-     //_cell.flush();
+	//_cell.flush();
 
-     //AT command to get IMEI.
-     SimpleWriteln(F("AT+GSN"));
+	//AT command to get IMEI.
+	SimpleWriteln(F("AT+GSN"));
 
-     //Read response from modem
+	//Read response from modem
 //#ifdef UNO
 //     _tf.getString("\r\n","\r\n",imei, 16);
 //#endif
@@ -359,12 +365,12 @@ int SIMCOM900::getIMEI(char *imei)
 //     _cell.getString("\r\n","\r\n",imei, 16);
 //#endif
 
-     //Expect str_ok.
-     if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV){
-     	memcpy(imei,GSM::comm_buf+2,15);
-     	imei[15]='\0';
-          return 0;
-     }else
-          return 1;
+	//Expect str_ok.
+	if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV){
+		memcpy(imei,GSM::comm_buf+2,15);
+		imei[15]='\0';
+		return 0;
+	}else
+		return 1;
 }
 

@@ -3,9 +3,10 @@
 
 #define _COMPORT_
 
+#include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <inttypes.h>
-#include "WideTextFinder.h"
+//#include "WideTextFinder.h"
 
 
 #define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
@@ -14,7 +15,7 @@
 #define ctrlz 26 //Ascii character for ctr+z. End of a SMS.
 #define cr    13 //Ascii character for carriage return. 
 #define lf    10 //Ascii character for line feed.
-#define GSM_LIB_VERSION 308 // library version X.YY (e.g. 1.00)
+#define GSM_LIB_VERSION 312 // library version X.YY (e.g. 1.00)
 
 // if defined, debug messages are sent to this serial port
 //#define DEBUG_SERIAL	Serial
@@ -150,11 +151,7 @@ enum getsms_ret_val_enum {
 	GETSMS_LAST_ITEM
 };
 
-#ifdef _COMPORT_
 #include "ComPort.h"
-#else
-#define UNO
-#endif
 
 class GSM {
 public:
@@ -184,7 +181,6 @@ private:
 protected:
 	int isIP(const char* cadena);
 	int _GSM_ON, _GSM_RESET;
-#ifdef _COMPORT_
 public:
 	inline void SelectHardwareSerial(HardwareSerial *HW_Serial,
 		int GSM_ON_pin = GSM_ON, int GSM_RESET_pin = 0)
@@ -201,9 +197,6 @@ public:
 		_GSM_RESET = GSM_RESET_pin;
 	}
 	ComPort	_cell;
-#else
-	 SoftwareSerial _cell;
-#endif
 
 public:
 	virtual int available();
@@ -220,7 +213,9 @@ public:
 	 void SimpleWriteln(int comm);
 
 public:
+	#ifdef WideTextFinder_h
 	WideTextFinder _tf;
+	#endif
 
 	inline void setStatus(GSM_st_e status) {
 		_status = status;
