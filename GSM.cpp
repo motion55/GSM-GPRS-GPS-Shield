@@ -456,7 +456,7 @@ char GSM::SendATCmdWaitResp(char const *AT_cmd_string,
 			ret_val = AT_RESP_ERR_NO_RESP;
 		}
 	}
-	WaitResp(1000, 5000);
+	WaitResp(1000, 100);
 
 	return (ret_val);
 }
@@ -511,7 +511,6 @@ char GSM::SendATCmdWaitResp(const __FlashStringHelper *AT_cmd,
 
 byte GSM::IsRxFinished(void)
 {
-	byte num_of_bytes;
 	byte ret_val = RX_NOT_FINISHED;  // default not finished
 
 	// Rx state machine
@@ -526,8 +525,7 @@ byte GSM::IsRxFinished(void)
 			{
 				// timeout elapsed => GSM module didn't start with response
 				// so communication is takes as finished
-				comm_buf_len = 0;
-				comm_buf[comm_buf_len] = 0;
+				comm_buf = "";
 				ret_val = RX_TMOUT_ERR;
 			}
 		}
@@ -535,8 +533,7 @@ byte GSM::IsRxFinished(void)
 		{
 			// at least one character received => so init inter-character
 			// counting process again and go to the next state
-			comm_buf_len = 0;
-			comm_buf[comm_buf_len] = 0;
+			comm_buf = "";
 			prev_time = millis(); // init timeout for inter-character space
 			rx_state = RX_ALREADY_STARTED;
 		}
@@ -547,36 +544,33 @@ byte GSM::IsRxFinished(void)
 		// Reception already started
 		// check new received bytes
 		// only in case we have place in the buffer
-		num_of_bytes = _cell.available();
 		// if there are some received bytes postpone the timeout
-		if (num_of_bytes) prev_time = millis();
+		unsigned long start_time = millis();
+		prev_time = start_time;
 
 		// read all received bytes
-		while (num_of_bytes) 
+		while ((unsigned long)(millis() - prev_time) < interchar_tmout)
 		{
-			num_of_bytes--;
-			byte dat = _cell.read();
-			if (comm_buf_len < COMM_BUF_LEN)
+			if (_cell.available() > 0)
 			{
-				// we have still place in the GSM internal comm. buffer =>
-				// move available bytes from circular buffer
-				// to the rx buffer
-				comm_buf[comm_buf_len] = dat;
-				comm_buf_len++;
-				comm_buf[comm_buf_len] = 0;  // and finish currently received characters
+				char dat = _cell.read();
+				if (comm_buf.length() < COMM_BUF_LEN)
+				{
+					// we have still place in the GSM internal comm. buffer =>
+					// move available bytes from circular buffer
+					// to the rx buffer
+					comm_buf += dat;
+				}
+				prev_time = millis();
+			}
+			else
+			if ((millis() - start_time) >= start_reception_tmout)
+			{
+				return 	ret_val;
 			}
 		}
 
-		// finally check the inter-character timeout
-		if ((unsigned long)(millis() - prev_time) >= interchar_tmout) 
-		{
-			// timeout between received character was reached
-			// reception is finished
-			// ---------------------------------------------
-			comm_buf[comm_buf_len] = 0;  // for sure finish string again
-			// but it is not necessary
-			ret_val = RX_FINISHED;
-		}
+		ret_val = RX_FINISHED;
 	}
 
 	return (ret_val);
@@ -595,17 +589,17 @@ byte GSM::IsStringReceived(const char *compare_string)
 	char *ch;
 	byte ret_val = 0;
 
-	if(comm_buf_len) 
+	if(comm_buf.length()>0) 
 	{
 		#ifdef DEBUG_SERIAL
 		DEBUG_SERIAL.print(F("ATT: "));
 		DEBUG_SERIAL.write(compare_string);
 		DEBUG_SERIAL.write("\r\n");
 		DEBUG_SERIAL.print(F("BUF: "));
-		DEBUG_SERIAL.write((const char*)comm_buf);
+		DEBUG_SERIAL.write((const char*)comm_buf.c_str());
 		DEBUG_SERIAL.write("\r\n");
 		#endif
-		ch = strstr((char*)comm_buf, compare_string);
+		ch = strstr((char*)comm_buf.c_str(), compare_string);
 		if (ch != NULL) 
 		{
 			ret_val = 1;
@@ -639,8 +633,7 @@ void GSM::RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
 	start_reception_tmout = start_comm_tmout;
 	interchar_tmout = max_interchar_tmout;
 	prev_time = millis();
-	comm_buf[0] = 0; // end of string
-	comm_buf_len = 0;
+	comm_buf = ""; // end of string
 	_cell.flush(); // erase rx circular buffer
 }
 
@@ -1117,7 +1110,7 @@ char GSM::GetPhoneNumber(byte position, char *phone_number)
 
 		// response in case there is not phone number:
 		// <CR><LF>OK<CR><LF>
-		p_char = strstr((char *)(comm_buf), ",\"");
+		p_char = strstr((char *)(comm_buf.c_str()), ",\"");
 		if (p_char != NULL) {
 			p_char++;
 			p_char++;       // we are on the first phone number character

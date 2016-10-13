@@ -39,7 +39,7 @@ char SIMCOM900::forceON()
 		ret_val=1;
 	}
 	
-	p_char = strchr((char *)(GSM::comm_buf),',');
+	p_char = strchr((char *)(GSM::comm_buf.c_str()),',');
 	p_char1 = p_char+1;
 	*(p_char1+2)=0;
 	p_char = strchr((char *)(p_char1), ',');
@@ -182,7 +182,7 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 	if(IsStringReceived("+CMGL")) 
 	{
 		//index
-		p_char = strchr((char *)(GSM::comm_buf),'+CMGL');
+		p_char = strchr((char *)(GSM::comm_buf.c_str()),'+CMGL');
 		p_char1 = p_char+3;  //we are on the first char of string
 		p_char = p_char1+1;
 		*p_char = 0;
@@ -345,7 +345,7 @@ int SIMCOM900::getIMEI(char *imei)
 
 	//Expect str_ok.
 	if(WaitResp(5000, 50, str_ok)!=RX_FINISHED_STR_NOT_RECV){
-		memcpy(imei,GSM::comm_buf+2,15);
+		memcpy(imei,GSM::comm_buf.c_str()+2,15);
 		imei[15]='\0';
 		return 0;
 	}else

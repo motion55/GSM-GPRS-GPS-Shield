@@ -220,7 +220,7 @@ char SMSGSM::IsSMSPresent(byte required_status)
 			// response is:
 			// +CMGL: <index>,<stat>,<oa/da>,,[,<tooa/toda>,<length>]
 			// <CR><LF> <data> <CR><LF>OK<CR><LF>
-			p_char = strchr((char *)gsm.comm_buf,':');
+			p_char = strchr((char *)gsm.comm_buf.c_str(),':');
 			if (p_char != NULL) {
 				ret_val = atoi(p_char+1);
 			}
@@ -345,7 +345,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, byte max_phone_len, char 
 
 		// extract phone number string
 		// ---------------------------
-		p_char = strchr((char *)(gsm.comm_buf),',');
+		p_char = strchr((char *)(gsm.comm_buf.c_str()),',');
 		p_char1 = p_char+2; // we are on the first phone number character
 		p_char = strchr((char *)(p_char1),'"');
 		if (p_char != NULL) {

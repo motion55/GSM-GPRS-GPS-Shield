@@ -11,7 +11,7 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol)
           ret_val=1;
 
      //BCL
-     p_char = strchr((char *)(gsm.comm_buf),',');
+     p_char = strchr((char *)(gsm.comm_buf.c_str()),',');
      p_char1 = p_char+1;  //we are on the first char of BCS
      p_char = strchr((char *)(p_char1), ',');
      if (p_char != NULL) {
@@ -41,7 +41,7 @@ char GPSGSM::getBattTVol(char *str_vol)
           ret_val=1;
 
      //BCL
-     p_char = strchr((char *)(gsm.comm_buf),':');
+     p_char = strchr((char *)(gsm.comm_buf.c_str()),':');
      p_char1 = p_char+2;  //we are on the first char of BCS
      p_char = strchr((char *)(p_char1), '\r');
      if (p_char != NULL) {
@@ -94,7 +94,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
           ret_val=1;
 
      //longitude
-     p_char = strchr((char *)(gsm.comm_buf),',');
+     p_char = strchr((char *)(gsm.comm_buf.c_str()),',');
      p_char1 = p_char+1;  //we are on the first char of longitude
      p_char = strchr((char *)(p_char1), ',');
      if (p_char != NULL) {

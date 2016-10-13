@@ -170,7 +170,7 @@ byte CallGSM::CallStatusWithAuth(char *phone_number,
           if (search_phone_num) {
                // extract phone number string
                // ---------------------------
-               p_char = strchr((char *)(gsm.comm_buf),'"');
+               p_char = strchr((char *)(gsm.comm_buf.c_str()),'"');
                p_char1 = p_char+1; // we are on the first phone number character
                p_char = strchr((char *)(p_char1),'"');
                if (p_char != NULL) {
@@ -324,7 +324,7 @@ char CallGSM::DetDTMF()
           //Serial.print("BUF: ");
           //Serial.println((char *)gsm.comm_buf);
           //Serial.println("end");
-          p_char = strstr((char *)(gsm.comm_buf),"+DTMF:");
+          p_char = strstr((char *)(gsm.comm_buf.c_str()),"+DTMF:");
           if (p_char != NULL) {
                p_char1 = p_char+6;  //we are on the first char of BCS
                dtmf_char = *p_char1;
