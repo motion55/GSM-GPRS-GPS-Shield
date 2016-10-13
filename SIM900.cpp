@@ -180,7 +180,7 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 
 	WaitResp(5000, 500);
 	if(IsStringReceived("+CMGL")) 
-	 {
+	{
 		//index
 		p_char = strchr((char *)(GSM::comm_buf),'+CMGL');
 		p_char1 = p_char+3;  //we are on the first char of string
@@ -209,28 +209,6 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 			*p_char = 0;
 		}
 		strcpy(msg, (char *)(p_char1));
-
-		// #ifdef UNO
-		// index=_tf.getValue();
-		// #endif
-		// #ifdef MEGA
-		//index=_cell.read();
-		// #endif
-		// DEBUG_SERIAL.println("DEBUG");
-		// #ifdef UNO
-		// _tf.getString("\",\"", "\"", number, nlength);
-		// #endif
-		// DEBUG_SERIAL.println("PRIMA");
-		// #ifdef MEGA
-		// _cell.getString("\",\"", "\"", number, nlength);
-		// #endif
-		// DEBUG_SERIAL.println("DEBUG");
-		// #ifdef UNO
-		// _tf.getString("\n", "\nOK", msg, msglength);
-		// #endif
-		// #ifdef MEGA
-		// _cell.getString("\n", "\nOK", msg, msglength);
-		// #endif
 
 		SimpleWrite(F("AT+CMGD="));
 		SimpleWriteln(index);

@@ -1,8 +1,6 @@
 #ifndef GSM_H
 #define GSM_H
 
-#define _COMPORT_
-
 #include <Arduino.h>
 #include <SoftwareSerial.h>
 #include <inttypes.h>

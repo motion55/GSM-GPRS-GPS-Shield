@@ -175,13 +175,13 @@ char SMSGSM::IsSMSPresent(byte required_status)
 
 	switch (required_status) {
 	case SMS_UNREAD:
-		gsm.SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
+		gsm.SimpleWriteln(F("AT+CMGL=\"REC UNREAD\""));
 		break;
 	case SMS_READ:
-		gsm.SimpleWriteln(F("AT+CMGL=\"REC READ\",1"));
+		gsm.SimpleWriteln(F("AT+CMGL=\"REC READ\""));
 		break;
 	case SMS_ALL:
-		gsm.SimpleWriteln(F("AT+CMGL=\"ALL\",1"));
+		gsm.SimpleWriteln(F("AT+CMGL=\"ALL\""));
 		break;
 	}
 
@@ -205,9 +205,6 @@ char SMSGSM::IsSMSPresent(byte required_status)
 		}
 		status = gsm.IsRxFinished();
 	} while (status == RX_NOT_FINISHED);
-
-
-
 
 	switch (status) {
 	case RX_TMOUT_ERR:

@@ -445,7 +445,7 @@ char GSM::SendATCmdWaitResp(char const *AT_cmd_string,
 		{
 			// something was received but what was received?
 			// ---------------------------------------------
-			if(IsStringReceived(response_string)) {
+			if(IsStringReceived(response_string)>0) {
 				ret_val = AT_RESP_OK;
 				break;  // response is OK => finish
 			} else ret_val = AT_RESP_ERR_DIF_RESP;
@@ -493,7 +493,7 @@ char GSM::SendATCmdWaitResp(const __FlashStringHelper *AT_cmd,
 			// something was received but what was received?
 			// ---------------------------------------------
 			String response_string(response);
-		    if(IsStringReceived(response_string.c_str())) 
+		    if(IsStringReceived(response_string.c_str())>0) 
 			{
 				ret_val = AT_RESP_OK;
 				break;  // response is OK => finish
@@ -828,8 +828,8 @@ byte GSM::CheckRegistration(void)
 	if (status == RX_FINISHED) {
 		// something was received but what was received?
 		// ---------------------------------------------
-		if (IsStringReceived("+CREG: 0,1")
-			|| IsStringReceived("+CREG: 0,5")) {
+		if (IsStringReceived("+CREG: 0,1")>0
+			|| IsStringReceived("+CREG: 0,5")>0) {
 			// it means module is registered
 			// ----------------------------
 			module_status |= STATUS_REGISTERED;
