@@ -1,11 +1,5 @@
 
 #include "SIM900.h"
-#include <SoftwareSerial.h>
-//If not used, is better to exclude the HTTP library,
-//for RAM saving.
-//If your sketch reboots itself proprably you have finished,
-//your memory available.
-//#include "inetGSM.h"
 
 //If you want to use the Arduino functions to manage SMS, uncomment the lines below.
 #include "sms.h"
@@ -80,7 +74,7 @@ void loop()
         }
         Serial.println(n);
         Serial.println(smsbuffer);
-        if (ret_val==GETSMS_UNREAD_SMS)
+        if ((ret_val == GETSMS_UNREAD_SMS) || (ret_val == GETSMS_READ_SMS))
         {
           if (sms.SendSMS(n,smsbuffer))
           {
