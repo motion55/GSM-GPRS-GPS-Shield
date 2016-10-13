@@ -7,9 +7,9 @@
 
 //#define RESETPIN 7
 
+#ifndef  _SINGLETON_
 SIMCOM900 gsm;
-SIMCOM900::SIMCOM900() {};
-SIMCOM900::~SIMCOM900() {};
+#endif
 
 /**********************************************************
 Function: 	This function permits to wake up the module
@@ -29,7 +29,7 @@ Comments:	It would be nice to call this function
 
 char SIMCOM900::forceON()
 {
-	 char ret_val=0;
+	char ret_val=0;
 	char *p_char;
 	char *p_char1;
 
@@ -49,9 +49,9 @@ char SIMCOM900::forceON()
 
 	if((*p_char1)=='4') {
 		digitalWrite(_GSM_ON, HIGH);
-		delay(1200);
+		delay(2000);
 		digitalWrite(_GSM_ON, LOW);
-		delay(10000);
+		delay(9000);
 		ret_val=2;
 	}
 

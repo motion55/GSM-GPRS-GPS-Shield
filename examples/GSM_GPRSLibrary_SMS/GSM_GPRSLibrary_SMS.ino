@@ -45,14 +45,6 @@ void loop()
 {
   if(started) 
   {
-    //Read if there are messages on SIM card and print them.
-    /**  deprecated method
-    if(gsm.readSMS(smsbuffer, 160, n, 20)) {
-       Serial.println(n);
-       Serial.println(smsbuffer);
-    }
-    **/
-    //get 1st sms
     int pos=sms.IsSMSPresent(SMS_ALL);
     if(pos>0&&pos<=20)
     {

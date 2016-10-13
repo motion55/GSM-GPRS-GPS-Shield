@@ -38,7 +38,6 @@ GSM::GSM()
 	_GSM_RESET = 0;
 };
 
-
 int GSM::begin(long baud_rate)
 {
 	// Set pin modes
@@ -66,9 +65,9 @@ int GSM::begin(long baud_rate)
 			if (_GSM_ON > 0)
 			{
 				digitalWrite(_GSM_ON, HIGH);
-				delay(1200);
+				delay(2000);
 				digitalWrite(_GSM_ON, LOW);
-				delay(10000);
+				delay(9000);
 			}
 			WaitResp(1000, 1000);
 		} 
