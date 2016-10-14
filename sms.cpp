@@ -27,12 +27,12 @@ an example of usage:
 char SMSGSM::SendSMS(char *number_str, char *message_str)
 {
 	char ret_val = 0;
-#ifdef ERROR_SERIAL
+	#ifdef ERROR_SERIAL
 	if (strlen(message_str) > 159)
 	{
 		ERROR_SERIAL.println(F("Don't send message longer than 160 characters"));
 	}
-#endif
+	#endif
 	byte i;
 	char end[2];
 	end[0]=0x1a;
@@ -42,37 +42,38 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
 	  gsm.SetCommLineStatus(CLS_ATCMD);
 	  ret_val = 0; // still not send
 	*/
+	#ifdef DEBUG_SERIAL
+	DEBUG_SERIAL.println(F("DEBUG:SMS SEND"));
+	#endif
 	// try to send SMS 3 times in case there is some problem
-	for (i = 0; i < 2; i++) {
+	for (i = 0; i < 2; i++) 
+	{
 		// send  AT+CMGS="number_str"
 		gsm.SimpleWrite(F("AT+CMGS=\""));
 		gsm.SimpleWrite(number_str);
 		gsm.SimpleWriteln("\"");
-
 		#ifdef DEBUG_SERIAL
-		DEBUG_SERIAL.println(F("DEBUG:SMS TEST"));
+		DEBUG_SERIAL.println(F("DEBUG:Waiting for >"));
 		#endif
 		// 1000 msec. for initial comm tmout
 		// 50 msec. for inter character timeout
-		if (RX_FINISHED_STR_RECV == gsm.WaitResp(1000, 500, F(">"))) 
-		  {
-			#ifdef DEBUG_SERIAL
-			DEBUG_SERIAL.println(F("DEBUG:>"));
-			#endif
+		if (RX_FINISHED_STR_RECV == gsm.WaitResp(2000, 100, F(">"))) 
+		{
 			// send SMS text
 			gsm.SimpleWrite(message_str);
 			gsm.SimpleWriteln(end);
 			//_cell.flush(); // erase rx circular buffer
-			if (RX_FINISHED_STR_RECV == gsm.WaitResp(7000, 5000, F("+CMGS"))) {
+			if (RX_FINISHED_STR_RECV == gsm.WaitResp(7000, 100, F("+CMGS"))) 
+			{
 				// SMS was sent correctly
 				ret_val = 1;
-
 				break;
 			} else continue;
-		} else {
+		} 
+		else 
+		{
 			// try again
 			continue;
-
 		}
 	}
 	gsm.SetCommLineStatus(CLS_FREE);
