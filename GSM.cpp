@@ -286,9 +286,24 @@ int GSM::begin(long baud_rate)
 	if(turnedON) 
 	{
 		WaitResp(50, 50);
+		#ifdef DEBUG_SERIAL
+		DEBUG_SERIAL.println(F("DB:InitParam(PARAM_SET_0)"));
+		#endif
 		InitParam(PARAM_SET_0);
+		#ifdef DEBUG_SERIAL
+		DEBUG_SERIAL.println(F("DB:InitParam(PARAM_SET_1)"));
+		#endif
 		InitParam(PARAM_SET_1);//configure the module
 		Echo(0);               //enable AT echo
+		#ifdef DEBUG_SERIAL
+		DEBUG_SERIAL.println(F("DB:Final AT OK check"));
+		#endif
+		for (cont = 0; cont < 3; cont++)
+		{
+			if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5))
+				break;
+			WaitResp(100, 50);
+		}
 		setStatus(READY);
 		return(1);
 
