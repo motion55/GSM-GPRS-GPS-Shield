@@ -69,6 +69,13 @@ int GSM::begin(long baud_rate)
 				digitalWrite(_GSM_ON, LOW);
 				delay(8000);
 			}
+			else if (_GSM_RESET> 0)
+			{
+				digitalWrite(_GSM_RESET, HIGH);
+				delay(2000);
+				digitalWrite(_GSM_RESET, LOW);
+				delay(8000);
+			}
 			WaitResp(1000, 1000);
 		} 
 		else 
