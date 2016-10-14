@@ -1,5 +1,5 @@
+
 #include "SIM900.h"
-#include "Streaming.h"
 
 #define _GSM_CONNECTION_TOUT_ 5
 #define _TCP_CONNECTION_TOUT_ 20
@@ -35,7 +35,8 @@ char SIMCOM900::forceON()
 
 	SimpleWriteln(F("AT+CREG?"));
 	WaitResp(5000, 100, str_ok);
-	if(IsStringReceived("OK")) {
+	if(IsStringReceived("OK")) 
+	{
 		ret_val=1;
 	}
 	
@@ -43,16 +44,21 @@ char SIMCOM900::forceON()
 	p_char1 = p_char+1;
 	*(p_char1+2)=0;
 	p_char = strchr((char *)(p_char1), ',');
-	if (p_char != NULL) {
+	if (p_char != NULL) 
+	{
 		*p_char = 0;
 	}
 
-	if((*p_char1)=='4') {
-		digitalWrite(_GSM_ON, HIGH);
-		delay(2000);
-		digitalWrite(_GSM_ON, LOW);
-		delay(9000);
-		ret_val=2;
+	if((*p_char1)=='4') 
+	{
+		if (_GSM_ON > 0)
+		{
+			digitalWrite(_GSM_ON, HIGH);
+			delay(2000);
+			digitalWrite(_GSM_ON, LOW);
+			delay(8000);
+			ret_val = 2;
+		}
 	}
 
 	return ret_val;
@@ -176,7 +182,7 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 
 	//_cell.flush();
 	WaitResp(500, 500);
-	SimpleWriteln(F("AT+CMGL=\"REC UNREAD\",1"));
+	SimpleWriteln(F("AT+CMGL=\"REC UNREAD\""));
 
 	WaitResp(5000, 500);
 	if(IsStringReceived("+CMGL")) 

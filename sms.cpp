@@ -187,7 +187,7 @@ char SMSGSM::IsSMSPresent(byte required_status)
 
 	// 5 sec. for initial comm tmout
 	// and max. 1500 msec. for inter character timeout
-	gsm.RxInit(5000, 1500);
+	gsm.RxInit(5000, 100);
 	// wait response is finished
 	do {
 		if (gsm.IsStringReceived("OK")) {
