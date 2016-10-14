@@ -651,12 +651,12 @@ byte GSM::IsStringReceived(const char *compare_string)
 
 void GSM::RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
 {
+	_cell.flush(); // erase rx circular buffer
 	rx_state = RX_NOT_STARTED;
 	start_reception_tmout = start_comm_tmout;
 	interchar_tmout = max_interchar_tmout;
 	prev_time = millis();
 	comm_buf = ""; // end of string
-	_cell.flush(); // erase rx circular buffer
 }
 
 void GSM::Echo(byte state)

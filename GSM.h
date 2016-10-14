@@ -198,15 +198,15 @@ public:
 	virtual int available();
 	virtual uint8_t read();
 	void SimpleRead(Stream &_Serial = Serial);
-	 void WhileSimpleRead(Stream &_Serial = Serial);
-	 void SimpleWrite(char *comm);
-	 void SimpleWrite(char const *comm);
-	 void SimpleWrite(int comm);
-	 void SimpleWrite(const __FlashStringHelper *pgmstr);
-	 void SimpleWriteln(char *comm);
-	 void SimpleWriteln(char const *comm);
-	 void SimpleWriteln(const __FlashStringHelper *pgmstr);
-	 void SimpleWriteln(int comm);
+	void WhileSimpleRead(Stream &_Serial = Serial);
+	void SimpleWrite(char *comm);
+	void SimpleWrite(char const *comm);
+	void SimpleWrite(int comm);
+	void SimpleWrite(const __FlashStringHelper *pgmstr);
+	void SimpleWriteln(char *comm);
+	void SimpleWriteln(char const *comm);
+	void SimpleWriteln(const __FlashStringHelper *pgmstr);
+	void SimpleWriteln(int comm);
 
 public:
 	#ifdef WideTextFinder_h
