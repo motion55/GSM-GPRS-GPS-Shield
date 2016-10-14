@@ -67,7 +67,7 @@ int GSM::begin(long baud_rate)
 				digitalWrite(_GSM_ON, HIGH);
 				delay(2000);
 				digitalWrite(_GSM_ON, LOW);
-				delay(9000);
+				delay(8000);
 			}
 			WaitResp(1000, 1000);
 		} 
@@ -516,7 +516,7 @@ byte GSM::IsRxFinished(void)
 	// Rx state machine
 	// ----------------
 	if (rx_state == RX_NOT_STARTED) 
-	 {
+	{
 		// Reception is not started yet - check tmout
 		if (!_cell.available()) 
 		{

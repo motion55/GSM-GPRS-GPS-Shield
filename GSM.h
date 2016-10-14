@@ -36,8 +36,8 @@
 //#define DEBUG_SMS_ENABLED
 
 // pins definition
-#define GSM_ON              7
-#define GSM_RESET           8
+#define GSM_ON              A5
+#define GSM_RESET           A6
 //#define DTMF_OUTPUT_ENABLE  71 // connect DTMF Output Enable not used
 #define DTMF_DATA_VALID     14 // connect DTMF Data Valid to pin 14
 #define DTMF_DATA0          72 // connect DTMF Data0 to pin 72
