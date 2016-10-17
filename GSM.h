@@ -166,7 +166,7 @@ private:
 
 	// variables connected with communication buffer
 	byte rx_state;                  // internal state of rx state machine
-	uint16_t start_reception_tmout; // max tmout for starting reception
+	uint16_t start_reception_tmout; // max tmeout for starting reception
 	uint16_t interchar_tmout;       // previous time in msec.
 	unsigned long prev_time;        // previous time in msec.
 

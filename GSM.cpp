@@ -46,14 +46,14 @@ int GSM::begin(long baud_rate)
 
 	int response=-1;
 	int cont=0;
-	boolean norep=true;
+	boolean noresp=true;
 	boolean turnedON=false;
 	SetCommLineStatus(CLS_ATCMD);
 	_cell.begin(baud_rate);
 	setStatus(IDLE);
 
 	// if no-reply we turn to turn on the module
-	for (cont=0; cont<3; cont++) 
+	for (cont=0; cont<4; cont++) 
 	{
 		if (AT_RESP_ERR_NO_RESP == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)&&!turnedON) 
 		{	//check power
@@ -94,73 +94,91 @@ int GSM::begin(long baud_rate)
 		DEBUG_SERIAL.println(F("DB:CORRECT BR"));
 		#endif
 		turnedON=true;
-		norep=false;
+		noresp=false;
 	}
 
 	if (AT_RESP_ERR_DIF_RESP == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)&&!turnedON) 
 	{		//check OK
 		#ifdef DEBUG_SERIAL
 		DEBUG_SERIAL.println(F("DB:AUTO BAUD RATE"));
+		int prev_baud;
 		#endif
 		for (int i=0; i<8; i++) {
 			switch (i) {
 			case 0:
 				_cell.begin(1200);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 1200;
+				#endif
 				break;
 
 			case 1:
 				_cell.begin(2400);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 2400;
+				#endif
 				break;
 
 			case 2:
 				_cell.begin(4800);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 4800;
+				#endif
 				break;
 
 			case 3:
 				_cell.begin(9600);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 9600;
+				#endif
 				break;
 
 			case 4:
 				_cell.begin(19200);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 19200;
+				#endif
 				break;
 
 			case 5:
 				_cell.begin(38400);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 38400;
+				#endif
 				break;
 
 			case 6:
 				_cell.begin(57600);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 57600;
+				#endif
 				break;
 
 			case 7:
 				_cell.begin(115200);
+				#ifdef DEBUG_SERIAL
+				prev_baud = 115200;
+				#endif
 				break;
 
 				// if nothing else matches, do the default
 				// default is optional
 			}
 
-			delay(100);
-
-			#ifdef DEBUG_PRINT
-			// parameter 0 - because module is off so it is not necessary
-			// to send finish AT<CR> here
-			DebugPrint("DEBUG: String ", 0);
-			DebugPrint(buff, 0);
-			#endif
-
+			delay(1000);
 
 			if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)) 
 			{
 				#ifdef DEBUG_SERIAL
-				DEBUG_SERIAL.println(F("DB:FOUND PREV BR"));
+				DEBUG_SERIAL.print(F("DB:FOUND PREV BR:"));
+				DEBUG_SERIAL.println(prev_baud);
 				#endif
 				_cell.print("AT+IPR=");
 				_cell.print(baud_rate);
 				_cell.print(0x0d); // send <CR>
-				delay(500);
+				delay(1000);
 				_cell.begin(baud_rate);
-				delay(100);
+				delay(1000);
 				if (AT_RESP_OK == SendATCmdWaitResp(str_at, 500, 100, str_ok, 5)) 
 				{
 					#ifdef DEBUG_SERIAL
@@ -179,7 +197,7 @@ int GSM::begin(long baud_rate)
 		// pointer is initialized to the first item of comm. buffer
 	}
 
-	if(norep==true&&!turnedON) 
+	if(noresp==true&&!turnedON) 
 	{
 		#ifdef DEBUG_SERIAL
 		DEBUG_SERIAL.println(F("Trying to force the baud-rate to 9600\n"));
@@ -550,13 +568,14 @@ byte GSM::IsRxFinished(void)
 				comm_buf = "";
 				ret_val = RX_TMOUT_ERR;
 			}
+			yield();
 		}
 		else 
 		{
 			// at least one character received => so init inter-character
 			// counting process again and go to the next state
 			comm_buf = "";
-			prev_time = millis(); // init timeout for inter-character space
+			prev_time = millis();
 			rx_state = RX_ALREADY_STARTED;
 		}
 	}
@@ -567,11 +586,9 @@ byte GSM::IsRxFinished(void)
 		// check new received bytes
 		// only in case we have place in the buffer
 		// if there are some received bytes postpone the timeout
-		unsigned long start_time = millis();
-		prev_time = start_time;
 
 		// read all received bytes
-		while ((unsigned long)(millis() - prev_time) < interchar_tmout)
+		if ((unsigned long)(millis() - prev_time) < interchar_tmout)
 		{
 			if (_cell.available() > 0)
 			{
@@ -586,13 +603,14 @@ byte GSM::IsRxFinished(void)
 				prev_time = millis();
 			}
 			else
-			if ((millis() - start_time) >= start_reception_tmout)
 			{
-				return 	ret_val;
+				yield();
 			}
 		}
-
-		ret_val = RX_FINISHED;
+		else
+		{
+			ret_val = RX_FINISHED;
+		}
 	}
 
 	return (ret_val);
@@ -639,9 +657,12 @@ byte GSM::IsStringReceived(const char *compare_string)
 	else 
 	{
 		#ifdef DEBUG_SERIAL
-		DEBUG_SERIAL.print(F("ATT: "));
-		DEBUG_SERIAL.println(compare_string);
-		DEBUG_SERIAL.println(F("BUF: NO STRING RCVD"));
+		if (rx_state == RX_ALREADY_STARTED)
+		{
+			DEBUG_SERIAL.print(F("ATT: "));
+			DEBUG_SERIAL.println(compare_string);
+			DEBUG_SERIAL.println(F("BUF: NO STRING RCVD"));
+		}
 		#endif
 	}
 
