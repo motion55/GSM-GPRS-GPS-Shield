@@ -1,7 +1,7 @@
 #ifndef _SMS_H_
 #define _SMS_H_
 
-#include "SIM900.h"
+#include "SIMCOM.h"
 
 class SMSGSM {
 public:
