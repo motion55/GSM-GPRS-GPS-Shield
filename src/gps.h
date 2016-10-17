@@ -1,7 +1,7 @@
 #ifndef _GPS_H_
 #define _GPS_H_
 
-#include "SIM900.h"
+#include "SIMCOM.h"
 
 class GPSGSM {
 public:

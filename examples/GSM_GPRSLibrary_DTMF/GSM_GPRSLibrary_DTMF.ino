@@ -1,5 +1,5 @@
-#include "SIM900.h"
-#include <SoftwareSerial.h>
+#include "SIMCOM.h"
+//#include <SoftwareSerial.h>
 //We don't need the http functions. So we can disable the next line.
 //#include "inetGSM.h"
 #include "sms.h"

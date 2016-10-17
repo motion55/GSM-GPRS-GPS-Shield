@@ -1,7 +1,7 @@
 #ifndef _CALL_H_
 #define _CALL_H_
 
-#include "SIM900.h"
+#include "SIMCOM.h"
 
 class CallGSM {
 public:

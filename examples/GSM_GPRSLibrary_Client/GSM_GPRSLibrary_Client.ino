@@ -1,5 +1,5 @@
-#include "SIM900.h"
-#include <SoftwareSerial.h>
+#include "SIMCOM.h"
+//#include <SoftwareSerial.h>
 #include "inetGSM.h"
 //#include "sms.h"
 //#include "call.h"

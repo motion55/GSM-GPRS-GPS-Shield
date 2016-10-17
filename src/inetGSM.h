@@ -3,7 +3,7 @@
 
 #define BUFFERSIZE 1
 
-#include "SIM900.h"
+#include "SIMCOM.h"
 
 class InetGSM {
 private:

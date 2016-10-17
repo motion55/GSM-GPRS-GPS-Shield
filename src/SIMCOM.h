@@ -1,5 +1,5 @@
-#ifndef SIMCOM900_H
-#define SIMCOM900_H
+#ifndef SIMCOM_H
+#define SIMCOM_H
 
 #include "GSM.h"
 
