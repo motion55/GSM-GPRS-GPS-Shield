@@ -191,7 +191,7 @@ char SMSGSM::IsSMSPresent(byte required_status)
 	gsm.RxInit(5000, 100);
 	// wait response is finished
 	do {
-		if (gsm.IsStringReceived("OK")) {
+		if (gsm.IsStringReceived("OK\r")) {
 			// perfect - we have some response, but what:
 
 			// there is either NO SMS:
