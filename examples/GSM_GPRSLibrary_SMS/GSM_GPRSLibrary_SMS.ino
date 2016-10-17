@@ -1,5 +1,5 @@
 
-#include "SIM900.h"
+#include "SIMCOM.h"
 
 //If you want to use the Arduino functions to manage SMS, uncomment the lines below.
 #include "sms.h"
@@ -12,7 +12,7 @@ boolean started=false;
 char smsbuffer[160] = "Arduino SMS";
 char n[20] = "09291234567";	//Replace with your cell number.
 
-const int RX_pin = 10;
+const int RX_pin = 2;
 const int TX_pin = 3;
 const int GSM_ON_pin = 7;
 
@@ -23,8 +23,11 @@ void setup()
   Serial.println(F("GSM Shield testing."));
 
   //Configure Comm Port to select Hardware or Software serial
-  //gsm.SelectHardwareSerial(&Serial1, GSM_ON_pin);
+#if defined(__AVR_ATmega328P__)
   gsm.SelectSoftwareSerial(RX_pin, TX_pin, GSM_ON_pin);
+#else
+  gsm.SelectHardwareSerial(&Serial1, GSM_ON_pin);
+#endif
 
   //Configure baudrate.
   if (gsm.begin(9600)) 
