@@ -57,19 +57,36 @@ char SMSGSM::SendSMS(char *number_str, char *message_str)
 		#endif
 		// 1000 msec. for initial comm tmout
 		// 50 msec. for inter character timeout
-		if (RX_FINISHED_STR_RECV == gsm.WaitResp(3000, 100, F(">"))) 
+		if (RX_FINISHED_STR_RECV == gsm.WaitResp(3000, 200, F(">"))) 
 		{
 			// send SMS text
 			gsm.SimpleWrite(message_str);
 			gsm.SimpleWriteln(end);
 			//_cell.flush(); // erase rx circular buffer
-			if (RX_FINISHED_STR_RECV == gsm.WaitResp(7000, 100, F("+CMGS"))) 
+			if (RX_FINISHED_STR_RECV == gsm.WaitResp(7000, 200, F("+CMGS"))) 
 			{
-				// SMS was sent correctly
-				ret_val = 1;
-				break;
-			} else continue;
-		} 
+				#ifdef DEBUG_SERIAL2
+				DEBUG_SERIAL2.println();
+				DEBUG_SERIAL2.print(F("SMS sent:"));
+				DEBUG_SERIAL2.println((char *)gsm.comm_buf.c_str());
+				#endif
+				if (gsm.IsStringReceived(F("OK\r")))
+				{
+					// SMS was sent correctly
+					ret_val = 1;
+					break;
+				}
+			} 
+			else
+			{
+				#ifdef DEBUG_SERIAL2
+				DEBUG_SERIAL2.println();
+				DEBUG_SERIAL2.print(F("SMS fail:"));
+				DEBUG_SERIAL2.println((char *)gsm.comm_buf.c_str());
+				#endif
+				continue;
+			}
+		}
 		else 
 		{
 			// try again
@@ -302,7 +319,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, byte max_phone_len, char 
 
 	// 5000 msec. for initial comm tmout
 	// 100 msec. for inter character tmout
-	switch (gsm.WaitResp(5000, 100, F("+CMGR:"))) {
+	switch (gsm.WaitResp(5000, 200, F("+CMGR:"))) {
 	case RX_TMOUT_ERR:
 		// response was not received in specific time
 		ret_val = -2;
