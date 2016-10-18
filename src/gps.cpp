@@ -7,7 +7,7 @@ char GPSGSM::getBattInf(char *str_perc, char *str_vol)
 
      gsm.SimpleWriteln(F("AT+CBC"));
      gsm.WaitResp(5000, 100, F("OK"));
-     if(gsm.IsStringReceived("+CBC"))
+     if(gsm.IsStringReceived(F("+CBC")))
           ret_val=1;
 
      //BCL
@@ -37,7 +37,7 @@ char GPSGSM::getBattTVol(char *str_vol)
 
      gsm.SimpleWriteln(F("AT+CBTE?"));
      gsm.WaitResp(5000, 100, F("OK"));
-     if(gsm.IsStringReceived("+CBTE"))
+     if(gsm.IsStringReceived(F("+CBTE")))
           ret_val=1;
 
      //BCL
@@ -72,13 +72,13 @@ char GPSGSM::getStat()
      char ret_val=-1;
      gsm.SimpleWriteln(F("AT+CGPSSTATUS?"));
      gsm.WaitResp(5000, 100, F("OK"));
-     if(gsm.IsStringReceived("Unknown")||gsm.IsStringReceived("unknown"))
+     if(gsm.IsStringReceived(F("Unknown"))||gsm.IsStringReceived(F("unknown")))
           ret_val=0;
-     else if(gsm.IsStringReceived("Not"))
+     else if(gsm.IsStringReceived(F("Not")))
           ret_val=1;
-     else if(gsm.IsStringReceived("2D")||gsm.IsStringReceived("2d"))
+     else if(gsm.IsStringReceived(F("2D"))||gsm.IsStringReceived(F("2d")))
           ret_val=2;
-     else if(gsm.IsStringReceived("3D")||gsm.IsStringReceived("3d"))
+     else if(gsm.IsStringReceived(F("3D"))||gsm.IsStringReceived(F("3d")))
           ret_val=3;
      return ret_val;
 }
@@ -90,7 +90,7 @@ char GPSGSM::getPar(char *str_long, char *str_lat, char *str_alt, char *str_time
      char *p_char1;
      gsm.SimpleWriteln(F("AT+CGPSINF=0"));
      gsm.WaitResp(5000, 100, F("OK"));
-     if(gsm.IsStringReceived("OK"))
+     if(gsm.IsStringReceived(F("OK")))
           ret_val=1;
 
      //longitude
