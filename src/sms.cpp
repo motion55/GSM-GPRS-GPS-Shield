@@ -310,7 +310,7 @@ char SMSGSM::GetSMS(byte position, char *phone_number, byte max_phone_len, char 
 
 	case RX_FINISHED_STR_NOT_RECV:
 		// OK was received => there is NO SMS stored in this position
-		if(gsm.IsStringReceived("OK")) {
+		if(gsm.IsStringReceived("OK\r")) {
 			// there is only response <CR><LF>OK<CR><LF>
 			// => there is NO SMS
 			ret_val = GETSMS_NO_SMS;
@@ -346,15 +346,28 @@ char SMSGSM::GetSMS(byte position, char *phone_number, byte max_phone_len, char 
 
 		// extract phone number string
 		// ---------------------------
-		p_char = strchr((char *)(gsm.comm_buf.c_str()),',');
+		p_char = strchr(gsm.comm_buf.begin(),',');
 		p_char1 = p_char+2; // we are on the first phone number character
-		p_char = strchr((char *)(p_char1),'"');
-		if (p_char != NULL) {
+		#ifdef DEBUG_SERIAL2
+		DEBUG_SERIAL2.println();
+		DEBUG_SERIAL2.print(F("p_char1:"));
+		DEBUG_SERIAL2.println((char *)p_char1);
+		#endif
+		p_char = strchr(p_char1,'"');
+		if (p_char != NULL)
+		{
 			*p_char = 0; // end of string
+			#ifdef DEBUG_SERIAL2
+			DEBUG_SERIAL2.print(F("p_char1:"));
+			DEBUG_SERIAL2.println((char *)p_char1);
+			#endif
 			len = strlen(p_char1);
-			if(len < max_phone_len){
+			if(len < max_phone_len)
+			{
 			  strcpy(phone_number, (char *)(p_char1));
-			}else{
+			}
+			else
+			{
 			  memcpy(phone_number,(char *)p_char1,(max_phone_len-1));
 			  phone_number[max_phone_len]=0;
 			}

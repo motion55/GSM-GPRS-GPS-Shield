@@ -7,9 +7,6 @@
 
 //#define RESETPIN 7
 
-#ifndef  _SINGLETON_
-SIMCOM900 gsm;
-#endif
 
 /**********************************************************
 Function: 	This function permits to wake up the module
@@ -27,7 +24,7 @@ Comments:	It would be nice to call this function
  			only if a SIM908 is used). 
 **********************************************************/
 
-char SIMCOM900::forceON()
+char SIMCOM::forceON()
 {
 	char ret_val=0;
 	char *p_char;
@@ -64,7 +61,7 @@ char SIMCOM900::forceON()
 	return ret_val;
 }
 
-int SIMCOM900::configandwait(char* pin)
+int SIMCOM::configandwait(char* pin)
 {
 	int connCode;
 	//_tf.setTimeout(_GSM_CONNECTION_TOUT_);
@@ -109,7 +106,7 @@ int SIMCOM900::configandwait(char* pin)
 * returns number of bytes read
 *
 */
-int SIMCOM900::read(char* result, int resultlength)
+int SIMCOM::read(char* result, int resultlength)
 {
 	char temp;
 	int i = 0;
@@ -133,7 +130,7 @@ int SIMCOM900::read(char* result, int resultlength)
 	return i;
 }
 
-int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
+int SIMCOM::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
 {
 	if (getStatus()==IDLE)
 		return 0;
@@ -162,7 +159,7 @@ int SIMCOM900::readCellData(int &mcc, int &mnc, long &lac, long &cellid)
 	return 1;
 }
 
-boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
+boolean SIMCOM::readSMS(char* msg, int msglength, char* number, int nlength)
 {
 	#ifdef ERROR_SERIAL
 	ERROR_SERIAL.println(F("This method is deprecated! Please use GetSMS in the SMS class."));
@@ -226,7 +223,7 @@ boolean SIMCOM900::readSMS(char* msg, int msglength, char* number, int nlength)
 	return false;
 };
 
-boolean SIMCOM900::readCall(char* number, int nlength)
+boolean SIMCOM::readCall(char* number, int nlength)
 {
 	int index;
 
@@ -249,7 +246,7 @@ boolean SIMCOM900::readCall(char* number, int nlength)
 	return false;
 };
 
-boolean SIMCOM900::call(char* number, unsigned int milliseconds)
+boolean SIMCOM::call(char* number, unsigned int milliseconds)
 {
 	if (getStatus()==IDLE)
 		return false;
@@ -266,7 +263,7 @@ boolean SIMCOM900::call(char* number, unsigned int milliseconds)
 
 }
 
-int SIMCOM900::setPIN(char *pin)
+int SIMCOM::setPIN(char *pin)
 {
 	//Status = READY or ATTACHED.
 	if((getStatus() != IDLE))
@@ -288,7 +285,7 @@ int SIMCOM900::setPIN(char *pin)
 		return 1;
 }
 
-int SIMCOM900::changeNSIPmode(char mode)
+int SIMCOM::changeNSIPmode(char mode)
 {
 	//_tf.setTimeout(_TCP_CONNECTION_TOUT_);
 
@@ -305,7 +302,7 @@ int SIMCOM900::changeNSIPmode(char mode)
 	return 1;
 }
 
-int SIMCOM900::getCCI(char *cci)
+int SIMCOM::getCCI(char *cci)
 {
 	//Status must be READY
 	if((getStatus() != READY))
@@ -331,7 +328,7 @@ int SIMCOM900::getCCI(char *cci)
 		return 1;
 }
 
-int SIMCOM900::getIMEI(char *imei)
+int SIMCOM::getIMEI(char *imei)
 {
 
 	//_tf.setTimeout(_GSM_DATA_TOUT_);	//Timeout for expecting modem responses.

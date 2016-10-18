@@ -51,6 +51,7 @@ int GSM::begin(long baud_rate)
 	SetCommLineStatus(CLS_ATCMD);
 	_cell.begin(baud_rate);
 	setStatus(IDLE);
+	comm_buf = String();
 
 	// if no-reply we turn to turn on the module
 	for (cont=0; cont<4; cont++) 
@@ -565,7 +566,7 @@ byte GSM::IsRxFinished(void)
 			{
 				// timeout elapsed => GSM module didn't start with response
 				// so communication is takes as finished
-				comm_buf = "";
+				comm_buf = String();
 				ret_val = RX_TMOUT_ERR;
 			}
 			yield();
@@ -574,7 +575,7 @@ byte GSM::IsRxFinished(void)
 		{
 			// at least one character received => so init inter-character
 			// counting process again and go to the next state
-			comm_buf = "";
+			comm_buf = String();
 			prev_time = millis();
 			rx_state = RX_ALREADY_STARTED;
 		}
@@ -677,7 +678,7 @@ void GSM::RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
 	start_reception_tmout = start_comm_tmout;
 	interchar_tmout = max_interchar_tmout;
 	prev_time = millis();
-	comm_buf = ""; // end of string
+	comm_buf = String();
 }
 
 void GSM::Echo(byte state)

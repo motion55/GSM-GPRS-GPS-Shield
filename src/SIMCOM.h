@@ -4,7 +4,7 @@
 #include "GSM.h"
 
 
-class SIMCOM900 : public virtual GSM {
+class SIMCOM : public virtual GSM {
 
 private:
 	int configandwait(char* pin);
@@ -12,16 +12,16 @@ private:
 	int changeNSIPmode(char);
 
 public:
-	SIMCOM900() {};
-	~SIMCOM900() {};
-	static SIMCOM900& GetInstance()
+	SIMCOM() {};
+	~SIMCOM() {};
+	static SIMCOM& GetInstance()
 	{	
-		static SIMCOM900* s_instance;
-		if (!s_instance) s_instance = new SIMCOM900;
+		static SIMCOM* s_instance;
+		if (!s_instance) s_instance = new SIMCOM;
 		return *s_instance;
 	}
-	SIMCOM900(SIMCOM900 const&) = delete;
-	void operator = (SIMCOM900 const&) = delete;
+	SIMCOM(SIMCOM const&) = delete;
+	void operator = (SIMCOM const&) = delete;
 
 	int getCCI(char* cci);
 	int getIMEI(char* imei);
@@ -34,13 +34,7 @@ public:
 	int readCellData(int &mcc, int &mnc, long &lac, long &cellid);
 };
 
-#define _SINGLETON_
-
-#ifdef  _SINGLETON_
-#define gsm (SIMCOM900::GetInstance())
-#else
-extern SIMCOM900 gsm;
-#endif
+#define gsm (SIMCOM::GetInstance())
 
 
 #endif

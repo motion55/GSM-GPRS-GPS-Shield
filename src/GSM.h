@@ -17,6 +17,7 @@
 
 // if defined, debug messages are sent to this serial port
 //#define DEBUG_SERIAL	Serial
+#define DEBUG_SERIAL2	Serial
 #define ERROR_SERIAL	Serial
 
 // if defined - debug print is enabled with possibility to print out
