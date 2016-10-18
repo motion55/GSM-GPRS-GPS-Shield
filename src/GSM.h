@@ -17,7 +17,7 @@
 
 // if defined, debug messages are sent to this serial port
 //#define DEBUG_SERIAL	Serial
-#define DEBUG_SERIAL2	Serial
+//#define DEBUG_SERIAL2	Serial
 #define ERROR_SERIAL	Serial
 
 // if defined - debug print is enabled with possibility to print out
@@ -231,6 +231,7 @@ public:
 	void RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
 	byte IsRxFinished(void);
 	byte IsStringReceived(const char *compare_string);
+	byte IsStringReceived(const __FlashStringHelper *compare_string);
 	byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout);
 	byte WaitResp(uint16_t start_comm_tmout, uint16_t max_interchar_tmout,
 			    const char *expected_resp_string);

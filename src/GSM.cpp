@@ -670,6 +670,11 @@ byte GSM::IsStringReceived(const char *compare_string)
 	return (ret_val);
 }
 
+byte GSM::IsStringReceived(const __FlashStringHelper *compare_string)
+{
+	String compare_str(compare_string);
+	return IsStringReceived(compare_str.c_str());
+}
 
 void GSM::RxInit(uint16_t start_comm_tmout, uint16_t max_interchar_tmout)
 {
@@ -864,8 +869,8 @@ byte GSM::CheckRegistration(void)
 	if (status == RX_FINISHED) {
 		// something was received but what was received?
 		// ---------------------------------------------
-		if (IsStringReceived("+CREG: 0,1")>0
-			|| IsStringReceived("+CREG: 0,5")>0) {
+		if (IsStringReceived(F("+CREG: 0,1"))>0
+			|| IsStringReceived(F("+CREG: 0,5"))>0) {
 			// it means module is registered
 			// ----------------------------
 			module_status |= STATUS_REGISTERED;

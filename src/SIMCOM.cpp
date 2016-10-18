@@ -32,7 +32,7 @@ char SIMCOM::forceON()
 
 	SimpleWriteln(F("AT+CREG?"));
 	WaitResp(5000, 100, str_ok);
-	if(IsStringReceived("OK")) 
+	if(IsStringReceived(F("OK")))
 	{
 		ret_val=1;
 	}
@@ -182,7 +182,7 @@ boolean SIMCOM::readSMS(char* msg, int msglength, char* number, int nlength)
 	SimpleWriteln(F("AT+CMGL=\"REC UNREAD\""));
 
 	WaitResp(5000, 500);
-	if(IsStringReceived("+CMGL")) 
+	if(IsStringReceived(F("+CMGL")))
 	{
 		//index
 		p_char = strchr((char *)(GSM::comm_buf.c_str()),'+CMGL');
