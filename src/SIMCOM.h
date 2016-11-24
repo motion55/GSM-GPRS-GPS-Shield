@@ -36,6 +36,7 @@ public:
 
 #define gsm (SIMCOM::GetInstance())
 
+#define _GNSS_
 
 #endif
 
